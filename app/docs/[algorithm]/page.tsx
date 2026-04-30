@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, GitCompare } from 'lucide-react'
 import { algorithms } from '@/lib/algorithm-registry'
 import { SortVisualizerWrapper } from '@/components/sort-visualizer-wrapper'
 import { CodeBlock } from '@/components/code-block'
 import { ComplexityTable } from '@/components/complexity-table'
 import { GlossaryLegend } from '@/components/glossary-legend'
+import { Button } from '@/components/ui/button'
 
 export async function generateStaticParams() {
   return algorithms.map((a) => ({ algorithm: a.slug }))
@@ -102,6 +103,17 @@ export default function AlgorithmPage({ params }: { params: { algorithm: string 
           {renderExplanation(algo.explanation)}
         </div>
       </section>
+
+      {/* Code-Diff banner */}
+      <div className="rounded-lg border border-dashed p-4 flex flex-wrap items-center justify-between gap-4 mb-10">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <GitCompare className="h-4 w-4 shrink-0" />
+          <span>Vergleiche <strong className="text-foreground">{algo.name}</strong> direkt mit einem anderen Algorithmus</span>
+        </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/docs/code-diff?a=${algo.slug}`}>Code vergleichen →</Link>
+        </Button>
+      </div>
 
       {/* Navigation footer */}
       <div className="border-t pt-8 flex justify-between items-center text-sm">

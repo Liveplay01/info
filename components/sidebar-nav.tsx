@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FlaskConical } from 'lucide-react'
+import { FlaskConical, MessageSquareQuote, GitCompare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { algorithms } from '@/lib/algorithm-registry'
 
@@ -62,6 +62,32 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
         >
           <FlaskConical className="h-3.5 w-3.5" />
           Playground
+        </Link>
+        <Link
+          href="/docs/interview-trainer"
+          onClick={onNavigate}
+          className={cn(
+            'flex items-center gap-2 text-sm py-1.5 px-2 rounded-md transition-colors hover:text-foreground',
+            pathname === '/docs/interview-trainer' || pathname === '/docs/interview-trainer/'
+              ? 'text-foreground font-medium bg-accent'
+              : 'text-muted-foreground'
+          )}
+        >
+          <MessageSquareQuote className="h-3.5 w-3.5" />
+          Interview Trainer
+        </Link>
+        <Link
+          href="/docs/code-diff"
+          onClick={onNavigate}
+          className={cn(
+            'flex items-center gap-2 text-sm py-1.5 px-2 rounded-md transition-colors hover:text-foreground',
+            pathname === '/docs/code-diff' || pathname === '/docs/code-diff/'
+              ? 'text-foreground font-medium bg-accent'
+              : 'text-muted-foreground'
+          )}
+        >
+          <GitCompare className="h-3.5 w-3.5" />
+          Code-Diff Viewer
         </Link>
       </div>
 

@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { MobileSidebar } from '@/components/mobile-sidebar'
+import { WattWiseButton } from '@/components/wattwise-button'
 import { Button } from '@/components/ui/button'
 
 export function Header() {
@@ -11,19 +11,6 @@ export function Header() {
         <div className="flex items-center gap-2 md:hidden">
           <MobileSidebar />
         </div>
-
-        {/* WattWise link – top left */}
-        <a
-          href="https://liveplay01.github.io/wattwise/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
-        >
-          WattWise
-          <ExternalLink className="h-3 w-3" />
-        </a>
-
-        <span className="text-border">|</span>
 
         <Link href="/docs" className="flex items-center gap-2 font-semibold">
           <span className="text-lg">⟨sort/⟩</span>
@@ -36,6 +23,7 @@ export function Header() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/docs">Dokumentation</Link>
           </Button>
+          <WattWiseButton />
           <ModeToggle />
         </nav>
       </div>

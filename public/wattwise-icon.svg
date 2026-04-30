@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Dark navy background -->
+  <rect width="100" height="100" fill="#152040"/>
+
+  <!-- Left diagonal pill -->
+  <line x1="37" y1="66" x2="51" y2="36" stroke="#4169e1" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Right diagonal pill -->
+  <line x1="53" y1="66" x2="67" y2="36" stroke="#4169e1" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- 4-pointed sparkle star -->
+  <path d="M 27 31 Q 28.5 40 35 42 Q 28.5 44 27 53 Q 25.5 44 19 42 Q 25.5 40 27 31 Z" fill="#4169e1"/>
+</svg>
