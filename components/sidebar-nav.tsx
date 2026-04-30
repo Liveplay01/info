@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { FlaskConical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { algorithms } from '@/lib/algorithm-registry'
 
@@ -42,6 +43,25 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
           )}
         >
           Übersicht
+        </Link>
+      </div>
+
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
+          Werkzeuge
+        </p>
+        <Link
+          href="/docs/playground"
+          onClick={onNavigate}
+          className={cn(
+            'flex items-center gap-2 text-sm py-1.5 px-2 rounded-md transition-colors hover:text-foreground',
+            pathname === '/docs/playground' || pathname === '/docs/playground/'
+              ? 'text-foreground font-medium bg-accent'
+              : 'text-muted-foreground'
+          )}
+        >
+          <FlaskConical className="h-3.5 w-3.5" />
+          Playground
         </Link>
       </div>
 
