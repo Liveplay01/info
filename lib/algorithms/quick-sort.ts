@@ -25,14 +25,14 @@ export function* quickSortSteps(input: number[]): Generator<SortStep> {
 
     for (let j = low; j < high; j++) {
       comparisons++
-      steps.push({ bars: [...arr], states: makeStates(pivotIdx, [j], []), description: `Comparing ${arr[j]} with pivot ${pivot}`, comparisons, swaps })
+      steps.push({ bars: [...arr], states: makeStates(pivotIdx, [j], []), description: `Vergleiche ${arr[j]} mit Pivot ${pivot}`, comparisons, swaps })
 
       if (arr[j] <= pivot) {
         i++
         if (i !== j) {
           ;[arr[i], arr[j]] = [arr[j], arr[i]]
           swaps++
-          steps.push({ bars: [...arr], states: makeStates(pivotIdx, [], [i, j]), description: `Swapped ${arr[j]} and ${arr[i]}`, comparisons, swaps })
+          steps.push({ bars: [...arr], states: makeStates(pivotIdx, [], [i, j]), description: `Getauscht: ${arr[j]} und ${arr[i]}`, comparisons, swaps })
         }
       }
     }
@@ -40,7 +40,7 @@ export function* quickSortSteps(input: number[]): Generator<SortStep> {
     ;[arr[i + 1], arr[high]] = [arr[high], arr[i + 1]]
     swaps++
     sorted.add(i + 1)
-    steps.push({ bars: [...arr], states: makeStates(-1, [], [i + 1, high]), description: `Pivot ${pivot} placed at index ${i + 1}`, comparisons, swaps })
+    steps.push({ bars: [...arr], states: makeStates(-1, [], [i + 1, high]), description: `Pivot ${pivot} an seiner endgültigen Position ${i + 1}`, comparisons, swaps })
 
     return i + 1
   }
@@ -56,7 +56,7 @@ export function* quickSortSteps(input: number[]): Generator<SortStep> {
   }
 
   quickSort(0, n - 1)
-  steps.push({ bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array is sorted!', comparisons, swaps })
+  steps.push({ bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array ist sortiert!', comparisons, swaps })
 
   for (const step of steps) yield step
 }

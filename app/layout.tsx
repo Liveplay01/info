@@ -6,8 +6,11 @@ import { ThemeProvider } from '@/components/theme-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'SortDocs – Sorting Algorithms Library',
-  description: 'Interactive visualizations and implementations of 10 classic sorting algorithms.',
+  title: 'SortDocs – Sortieralgorithmen Bibliothek',
+  description: 'Interaktive Schritt-für-Schritt-Visualisierungen und saubere TypeScript-Implementierungen von 10 klassischen Sortieralgorithmen.',
+  icons: {
+    icon: '/github.svg',
+  },
 }
 
 export default function RootLayout({
@@ -16,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="de" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}

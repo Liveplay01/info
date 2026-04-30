@@ -13,7 +13,7 @@ export function* insertionSortSteps(input: number[]): Generator<SortStep> {
     yield {
       bars: [...arr],
       states: arr.map((_, idx) => (idx === i ? 'comparing' : idx < i ? 'sorted' : 'default')),
-      description: `Inserting element ${key} from index ${i}`,
+      description: `Füge Element ${key} von Index ${i} ein`,
       comparisons,
       swaps,
     }
@@ -29,7 +29,7 @@ export function* insertionSortSteps(input: number[]): Generator<SortStep> {
           if (idx < i) return 'sorted'
           return 'default'
         }),
-        description: `Shifting ${arr[j]} right to make room`,
+        description: `Verschiebe ${arr[j]} nach rechts`,
         comparisons,
         swaps,
       }
@@ -40,11 +40,11 @@ export function* insertionSortSteps(input: number[]): Generator<SortStep> {
     yield {
       bars: [...arr],
       states: arr.map((_, idx) => (idx <= i ? 'sorted' : 'default')),
-      description: `Placed ${key} at index ${j + 1}`,
+      description: `${key} an Position ${j + 1} eingesetzt`,
       comparisons,
       swaps,
     }
   }
 
-  yield { bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array is sorted!', comparisons, swaps }
+  yield { bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array ist sortiert!', comparisons, swaps }
 }

@@ -9,14 +9,20 @@ const categoryColors: Record<string, string> = {
   Hybrid: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800',
 }
 
+const categoryLabels: Record<string, string> = {
+  Comparison: 'Vergleichsbasiert',
+  'Non-Comparison': 'Nicht-Vergleichsbasiert',
+  Hybrid: 'Hybrid',
+}
+
 export default function DocsPage() {
   return (
     <div>
       <div className="mb-10">
-        <h1 className="text-4xl font-bold tracking-tight mb-3">Sorting Algorithms</h1>
+        <h1 className="text-4xl font-bold tracking-tight mb-3">Sortieralgorithmen</h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Interactive step-by-step visualizations and clean TypeScript implementations of 10 classic sorting algorithms.
-          From O(n²) fundamentals to O(n) non-comparison sorts.
+          Interaktive Schritt-für-Schritt-Visualisierungen und saubere TypeScript-Implementierungen von 10 klassischen Sortieralgorithmen —
+          von O(n²)-Grundlagen bis hin zu linearen Nicht-Vergleichssortiervarianten.
         </p>
       </div>
 
@@ -24,7 +30,7 @@ export default function DocsPage() {
         {(['Comparison', 'Non-Comparison', 'Hybrid'] as const).map((cat) => (
           <div key={cat} className="flex items-center gap-1.5">
             <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColors[cat]}`}>
-              {cat}
+              {categoryLabels[cat]}
             </span>
             <span className="text-xs text-muted-foreground">
               ({algorithms.filter((a) => a.category === cat).length})
@@ -43,24 +49,24 @@ export default function DocsPage() {
                     {algo.name}
                   </CardTitle>
                   <span className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${categoryColors[algo.category]}`}>
-                    {algo.category}
+                    {categoryLabels[algo.category]}
                   </span>
                 </div>
                 <div className="flex gap-1.5 flex-wrap">
                   <Badge variant="outline" className="font-mono text-xs h-5">
-                    avg: {algo.complexity.average}
+                    Ø: {algo.complexity.average}
                   </Badge>
                   <Badge variant="outline" className="font-mono text-xs h-5">
-                    space: {algo.complexity.space}
+                    Speicher: {algo.complexity.space}
                   </Badge>
                   {algo.stable && (
                     <Badge variant="outline" className="text-xs h-5 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700">
-                      Stable
+                      Stabil
                     </Badge>
                   )}
                   {algo.inPlace && (
                     <Badge variant="outline" className="text-xs h-5">
-                      In-place
+                      In-Place
                     </Badge>
                   )}
                 </div>

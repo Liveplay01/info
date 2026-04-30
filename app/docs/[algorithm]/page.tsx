@@ -25,6 +25,12 @@ const categoryColors: Record<string, string> = {
   Hybrid: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800',
 }
 
+const categoryLabels: Record<string, string> = {
+  Comparison: 'Vergleichsbasiert',
+  'Non-Comparison': 'Nicht-Vergleichsbasiert',
+  Hybrid: 'Hybrid',
+}
+
 function renderExplanation(text: string) {
   return text.split('\n\n').map((paragraph, i) => {
     const parts = paragraph.split(/(\*\*[^*]+\*\*)/g)
@@ -58,7 +64,7 @@ export default function AlgorithmPage({ params }: { params: { algorithm: string 
       <div className="flex flex-wrap items-center gap-3 mb-2">
         <h1 className="text-3xl font-bold tracking-tight">{algo.name}</h1>
         <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColors[algo.category]}`}>
-          {algo.category}
+          {categoryLabels[algo.category]}
         </span>
       </div>
 
@@ -68,26 +74,26 @@ export default function AlgorithmPage({ params }: { params: { algorithm: string 
 
       {/* Visualizer */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Live Visualization</h2>
+        <h2 className="text-xl font-semibold mb-4">Live-Visualisierung</h2>
         <SortVisualizerWrapper slug={algo.slug} />
       </section>
 
       {/* Complexity */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Complexity</h2>
+        <h2 className="text-xl font-semibold mb-4">Komplexität</h2>
         <ComplexityTable algo={algo} />
       </section>
 
       {/* Code */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Implementation</h2>
-        <p className="text-sm text-muted-foreground mb-4">TypeScript implementation ready to copy and use.</p>
+        <h2 className="text-xl font-semibold mb-4">Implementierung</h2>
+        <p className="text-sm text-muted-foreground mb-4">TypeScript-Implementierung — direkt kopierbereit.</p>
         <CodeBlock code={algo.codeTS} lang="typescript" />
       </section>
 
       {/* Explanation */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">How It Works</h2>
+        <h2 className="text-xl font-semibold mb-4">Wie es funktioniert</h2>
         <div className="space-y-4 max-w-2xl">
           {renderExplanation(algo.explanation)}
         </div>

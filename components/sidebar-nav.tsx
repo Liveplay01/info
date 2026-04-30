@@ -7,9 +7,15 @@ import { algorithms } from '@/lib/algorithm-registry'
 
 const categoryOrder = ['Comparison', 'Non-Comparison', 'Hybrid'] as const
 
+const categoryLabels: Record<string, string> = {
+  'Comparison': 'Vergleichsbasiert',
+  'Non-Comparison': 'Nicht-Vergleichsbasiert',
+  'Hybrid': 'Hybrid',
+}
+
 function groupAlgorithms() {
   return categoryOrder.map((cat) => ({
-    label: cat,
+    label: categoryLabels[cat],
     items: algorithms.filter((a) => a.category === cat),
   }))
 }
@@ -35,7 +41,7 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
               : 'text-muted-foreground'
           )}
         >
-          Overview
+          Übersicht
         </Link>
       </div>
 

@@ -19,7 +19,7 @@ export function* mergeSortSteps(input: number[]): Generator<SortStep> {
         if (idx >= left && idx <= right) return 'swapping'
         return 'default'
       })
-      steps.push({ bars: [...arr], states, description: `Merging: comparing ${leftArr[i]} and ${rightArr[j]}`, comparisons, swaps })
+      steps.push({ bars: [...arr], states, description: `Zusammenführen: vergleiche ${leftArr[i]} und ${rightArr[j]}`, comparisons, swaps })
 
       if (leftArr[i] <= rightArr[j]) {
         arr[k++] = leftArr[i++]
@@ -36,7 +36,7 @@ export function* mergeSortSteps(input: number[]): Generator<SortStep> {
       if (idx >= left && idx <= right) return 'sorted'
       return 'default'
     })
-    steps.push({ bars: [...arr], states, description: `Merged section [${left}..${right}]`, comparisons, swaps })
+    steps.push({ bars: [...arr], states, description: `Bereich [${left}..${right}] zusammengeführt`, comparisons, swaps })
   }
 
   function mergeSort(arr: number[], left: number, right: number) {
@@ -48,7 +48,7 @@ export function* mergeSortSteps(input: number[]): Generator<SortStep> {
   }
 
   mergeSort(arr, 0, n - 1)
-  steps.push({ bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array is sorted!', comparisons, swaps })
+  steps.push({ bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array ist sortiert!', comparisons, swaps })
 
   for (const step of steps) yield step
 }

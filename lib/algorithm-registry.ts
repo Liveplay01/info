@@ -20,13 +20,13 @@ export const algorithms: AlgorithmMeta[] = [
     slug: 'bubble-sort',
     name: 'Bubble Sort',
     category: 'Comparison',
-    shortDescription: 'Repeatedly swaps adjacent elements that are out of order, bubbling the largest unsorted element to its final position each pass.',
+    shortDescription: 'Vergleicht benachbarte Elemente wiederholt und tauscht sie bei falscher Reihenfolge — das größte unsortierte Element „blubbert" dabei pro Durchgang an seine endgültige Position.',
     complexity: { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
     stable: true,
     inPlace: true,
-    explanation: `Bubble Sort is the simplest sorting algorithm. It works by repeatedly comparing adjacent pairs and swapping them if they are in the wrong order. After each full pass, the largest unsorted element "bubbles up" to its correct position at the end. An optimized version tracks whether any swap occurred; if a pass completes without a swap, the array is already sorted, giving O(n) best-case performance.
+    explanation: `Bubble Sort ist der einfachste Sortieralgorithmus. Er funktioniert, indem er benachbarte Paare wiederholt vergleicht und sie bei falscher Reihenfolge tauscht. Nach jedem vollständigen Durchgang „blubbert" das größte unsortierte Element an seine korrekte Position am Ende. Eine optimierte Version prüft, ob ein Tausch stattgefunden hat — bleibt ein Durchgang tauschfrei, ist das Array bereits sortiert, was eine O(n)-Laufzeit im besten Fall ergibt.
 
-**When to use:** Almost never in production — it is O(n²) in most cases. Its primary value is educational: it is easy to visualize and reason about. The only practical niche is tiny arrays (< 10 elements) where the overhead of more complex algorithms exceeds their benefit.`,
+**Wann verwenden:** In der Praxis fast nie — bei den meisten Eingaben ist die Laufzeit O(n²). Sein Hauptwert liegt im Lernbereich: Er ist leicht zu verstehen und zu visualisieren. Die einzige praktische Nische sind winzige Arrays (< 10 Elemente), wo der Overhead komplexerer Algorithmen ihren Vorteil überwiegt.`,
     codeTS: `function bubbleSort(arr: number[]): number[] {
   const n = arr.length;
   for (let i = 0; i < n - 1; i++) {
@@ -37,7 +37,7 @@ export const algorithms: AlgorithmMeta[] = [
         swapped = true;
       }
     }
-    if (!swapped) break; // Already sorted
+    if (!swapped) break; // Bereits sortiert
   }
   return arr;
 }`,
@@ -46,15 +46,15 @@ export const algorithms: AlgorithmMeta[] = [
     slug: 'selection-sort',
     name: 'Selection Sort',
     category: 'Comparison',
-    shortDescription: 'Finds the minimum element from the unsorted portion and places it at the beginning, growing the sorted portion one element at a time.',
+    shortDescription: 'Findet das Minimum im unsortierten Bereich und platziert es am Anfang — der sortierte Bereich wächst so pro Durchgang um ein Element.',
     complexity: { best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
     stable: false,
     inPlace: true,
-    explanation: `Selection Sort divides the array into a sorted and unsorted region. On each pass, it scans the entire unsorted region to find the minimum element, then swaps it into the first position of the unsorted region. The sorted region grows by one element per pass.
+    explanation: `Selection Sort teilt das Array in einen sortierten und einen unsortierten Bereich. In jedem Durchgang durchsucht er den gesamten unsortierten Bereich nach dem Minimum und tauscht es an die erste Position des unsortierten Bereichs. Der sortierte Bereich wächst um ein Element pro Durchgang.
 
-**Key property:** Selection Sort makes at most O(n) swaps — useful when swap cost is high (e.g., large objects in memory). However, it is always O(n²) comparisons regardless of the input, unlike Bubble Sort which can exit early.
+**Besondere Eigenschaft:** Selection Sort führt höchstens O(n) Tauschoperationen durch — nützlich, wenn das Verschieben von Elementen teuer ist (z. B. große Objekte im Speicher). Allerdings sind immer O(n²) Vergleiche nötig, unabhängig von der Eingabe.
 
-**When to use:** When the cost of writes/swaps is significantly higher than reads, and the array is small. It is also not stable by default (equal elements may be reordered), which is a disadvantage in many contexts.`,
+**Wann verwenden:** Wenn die Kosten für Schreiboperationen deutlich höher sind als für Leseoperationen, und das Array klein ist. Da der Algorithmus nicht stabil ist (gleiche Elemente können ihre Reihenfolge verlieren), ist er in vielen Kontexten ungeeignet.`,
     codeTS: `function selectionSort(arr: number[]): number[] {
   const n = arr.length;
   for (let i = 0; i < n - 1; i++) {
@@ -73,15 +73,15 @@ export const algorithms: AlgorithmMeta[] = [
     slug: 'insertion-sort',
     name: 'Insertion Sort',
     category: 'Comparison',
-    shortDescription: 'Builds the sorted array one element at a time by inserting each new element into its correct position among the already-sorted elements.',
+    shortDescription: 'Baut das sortierte Array Element für Element auf, indem jedes neue Element an der richtigen Position unter den bereits sortierten Elementen eingefügt wird.',
     complexity: { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
     stable: true,
     inPlace: true,
-    explanation: `Insertion Sort is analogous to sorting playing cards in your hand. You pick up one card at a time and slide it leftward into its correct position among the cards already sorted. The left portion is always sorted; you expand it by one element per step.
+    explanation: `Insertion Sort ist vergleichbar mit dem Sortieren von Spielkarten in der Hand. Eine Karte nach der anderen wird aufgenommen und nach links an die richtige Position zwischen den bereits sortierten Karten geschoben. Die linke Seite ist stets sortiert; sie wächst pro Schritt um ein Element.
 
-**Why it matters:** Insertion Sort is exceptionally fast on nearly-sorted data (O(n) comparisons), adaptive (performance improves with existing order), and has very low overhead. This makes it the algorithm of choice for small arrays — which is why TimSort (used in Python and Java) uses Insertion Sort for sub-arrays below a threshold (~32–64 elements).
+**Warum er wichtig ist:** Insertion Sort ist bei nahezu sortierten Daten extrem schnell (O(n) Vergleiche), adaptiv (die Leistung verbessert sich mit vorhandener Ordnung) und hat sehr geringen Overhead. Deshalb wird er für kleine Arrays bevorzugt — TimSort (verwendet in Python und Java) nutzt ihn für Teilarrays unterhalb einer Schwelle (~32–64 Elemente).
 
-**When to use:** Small arrays (< 20 elements), nearly-sorted input, or as the base case in hybrid algorithms.`,
+**Wann verwenden:** Kleine Arrays (< 20 Elemente), nahezu sortierte Eingaben oder als Basisfall in hybriden Algorithmen.`,
     codeTS: `function insertionSort(arr: number[]): number[] {
   const n = arr.length;
   for (let i = 1; i < n; i++) {
@@ -100,17 +100,17 @@ export const algorithms: AlgorithmMeta[] = [
     slug: 'merge-sort',
     name: 'Merge Sort',
     category: 'Comparison',
-    shortDescription: 'Divides the array in half recursively until single elements remain, then merges sorted halves back together — guaranteed O(n log n).',
+    shortDescription: 'Teilt das Array rekursiv in Hälften, bis einzelne Elemente übrig sind, und fügt sortierte Hälften wieder zusammen — garantiert O(n log n).',
     complexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)' },
     stable: true,
     inPlace: false,
-    explanation: `Merge Sort is a classic divide-and-conquer algorithm. It recursively splits the array into halves until each sub-array has one element (which is trivially sorted), then merges adjacent sorted sub-arrays. The merge step is the key: it interleaves two sorted sequences into one sorted sequence in O(n) time.
+    explanation: `Merge Sort ist ein klassischer Teile-und-Herrsche-Algorithmus. Er teilt das Array rekursiv in Hälften, bis jedes Teilarray nur noch ein Element enthält (was trivialerweise sortiert ist), und fügt dann benachbarte sortierte Teilarrays zusammen. Der Zusammenführungsschritt ist der Schlüssel: Er verschmilzt zwei sortierte Sequenzen in O(n) Zeit zu einer sortierten Sequenz.
 
-**Guarantees:** Unlike QuickSort, Merge Sort's worst case is still O(n log n) — it does not degrade on adversarial input. It is also stable (equal elements preserve their original order).
+**Garantien:** Im Gegensatz zu QuickSort ist der schlechteste Fall von Merge Sort immer O(n log n) — er degradiert bei keiner Eingabe. Er ist außerdem stabil (gleiche Elemente behalten ihre ursprüngliche Reihenfolge).
 
-**Tradeoff:** It requires O(n) auxiliary space for the temporary merge buffer, unlike in-place algorithms.
+**Nachteil:** Er benötigt O(n) zusätzlichen Speicher für den temporären Merge-Puffer.
 
-**When to use:** When you need guaranteed O(n log n), when stability matters, or when sorting linked lists (where it can be done in O(1) space). Used in Java's Arrays.sort for objects.`,
+**Wann verwenden:** Wenn garantiertes O(n log n), Stabilität oder das Sortieren von verketteten Listen gefragt ist. Wird in Javas Arrays.sort für Objekte eingesetzt.`,
     codeTS: `function mergeSort(arr: number[]): number[] {
   if (arr.length <= 1) return arr;
   const mid = Math.floor(arr.length / 2);
@@ -133,17 +133,17 @@ function merge(left: number[], right: number[]): number[] {
     slug: 'quick-sort',
     name: 'Quick Sort',
     category: 'Comparison',
-    shortDescription: 'Selects a pivot, partitions the array into elements less than and greater than the pivot, then recursively sorts each partition.',
+    shortDescription: 'Wählt einen Pivot, partitioniert das Array in Elemente kleiner und größer als der Pivot und sortiert jede Partition rekursiv.',
     complexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n²)', space: 'O(log n)' },
     stable: false,
     inPlace: true,
-    explanation: `QuickSort is the most widely used general-purpose sorting algorithm. It selects a "pivot" element, then rearranges the array so all elements smaller than the pivot come before it, and all larger elements come after. It recursively applies this partitioning to each side.
+    explanation: `QuickSort ist der meistgenutzte Allzweck-Sortieralgorithmus. Er wählt ein „Pivot"-Element und ordnet das Array so um, dass alle kleineren Elemente vor dem Pivot stehen und alle größeren danach. Anschließend wird dieses Partitionierungsverfahren rekursiv auf jede Seite angewendet.
 
-**Pivot selection matters:** Naive implementations using the first or last element as pivot degrade to O(n²) on already-sorted arrays. Production implementations use median-of-three or random pivot selection to avoid this.
+**Pivot-Auswahl ist entscheidend:** Naive Implementierungen, die das erste oder letzte Element als Pivot nehmen, degradieren bei bereits sortierten Arrays auf O(n²). Produktive Implementierungen verwenden Median-of-Three oder zufällige Pivot-Auswahl.
 
-**In-place:** Unlike Merge Sort, QuickSort partitions in-place with only O(log n) stack space for the recursive calls.
+**In-Place:** Im Gegensatz zu Merge Sort partitioniert QuickSort direkt im Array mit nur O(log n) Stack-Speicher für die rekursiven Aufrufe.
 
-**When to use:** General-purpose sorting where average-case performance matters. It is the fastest in practice for most random data due to excellent cache behavior. Used in C's qsort, JavaScript's V8 engine for primitives.`,
+**Wann verwenden:** Allgemeines Sortieren, bei dem die durchschnittliche Laufzeit entscheidend ist. In der Praxis der schnellste Algorithmus für zufällige Daten durch ausgezeichnetes Cache-Verhalten. Wird in C's qsort und V8's JavaScript-Engine verwendet.`,
     codeTS: `function quickSort(arr: number[], low = 0, high = arr.length - 1): number[] {
   if (low < high) {
     const pi = partition(arr, low, high);
@@ -154,7 +154,7 @@ function merge(left: number[], right: number[]): number[] {
 }
 
 function partition(arr: number[], low: number, high: number): number {
-  // Median-of-three pivot selection
+  // Median-of-Three Pivot-Auswahl
   const mid = Math.floor((low + high) / 2);
   if (arr[mid] < arr[low]) [arr[low], arr[mid]] = [arr[mid], arr[low]];
   if (arr[high] < arr[low]) [arr[low], arr[high]] = [arr[high], arr[low]];
@@ -175,24 +175,24 @@ function partition(arr: number[], low: number, high: number): number {
     slug: 'heap-sort',
     name: 'Heap Sort',
     category: 'Comparison',
-    shortDescription: 'Builds a max-heap from the array, then repeatedly extracts the maximum element to produce a sorted sequence in-place.',
+    shortDescription: 'Baut einen Max-Heap auf und extrahiert wiederholt das Maximum — erzeugt so eine sortierte Sequenz direkt im Array.',
     complexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(1)' },
     stable: false,
     inPlace: true,
-    explanation: `Heap Sort uses the binary heap data structure. It first transforms the array into a max-heap (where every parent is larger than its children) using Floyd's heapification in O(n) time. Then it repeatedly swaps the root (maximum element) with the last unsorted element, shrinks the heap boundary by one, and restores the heap property.
+    explanation: `Heap Sort nutzt die binäre Heap-Datenstruktur. Zuerst wird das Array mithilfe von Floyds Heapify-Verfahren in O(n) in einen Max-Heap umgewandelt (jedes Elternelement ist größer als seine Kinder). Dann wird wiederholt die Wurzel (das Maximum) mit dem letzten unsortierten Element getauscht, die Heap-Grenze um eins verkleinert und die Heap-Eigenschaft wiederhergestellt.
 
-**Advantages:** Guaranteed O(n log n) worst-case with O(1) auxiliary space — the only comparison sort with both properties.
+**Vorteile:** Garantiertes O(n log n) im schlechtesten Fall bei O(1) Hilfsspeicher — der einzige Vergleichssortierer mit beiden Eigenschaften gleichzeitig.
 
-**Disadvantages:** Poor cache performance (sift-down accesses memory non-sequentially), and not stable.
+**Nachteile:** Schlechtes Cache-Verhalten (Sift-Down greift nicht-sequentiell auf den Speicher zu), und nicht stabil.
 
-**When to use:** When you need guaranteed O(n log n) and cannot use O(n) extra memory. Also used in introselect (the algorithm behind C++'s nth_element).`,
+**Wann verwenden:** Wenn garantiertes O(n log n) ohne zusätzlichen Speicher benötigt wird. Wird auch in Introselect verwendet (der Algorithmus hinter C++'s nth_element).`,
     codeTS: `function heapSort(arr: number[]): number[] {
   const n = arr.length;
-  // Build max-heap
+  // Max-Heap aufbauen
   for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
     heapify(arr, n, i);
   }
-  // Extract elements from heap one by one
+  // Elemente aus dem Heap extrahieren
   for (let i = n - 1; i > 0; i--) {
     [arr[0], arr[i]] = [arr[i], arr[0]];
     heapify(arr, i, 0);
@@ -216,20 +216,20 @@ function heapify(arr: number[], n: number, i: number): void {
     slug: 'shell-sort',
     name: 'Shell Sort',
     category: 'Comparison',
-    shortDescription: 'An improved insertion sort that first sorts elements far apart, then progressively reduces the gap until a final pass of standard insertion sort.',
+    shortDescription: 'Eine verbesserte Variante des Insertion Sort, die zuerst weit auseinanderliegende Elemente sortiert und den Abstand schrittweise reduziert bis zum finalen Insertion-Sort-Durchgang.',
     complexity: { best: 'O(n log n)', average: 'O(n log² n)', worst: 'O(n²)', space: 'O(1)' },
     stable: false,
     inPlace: true,
-    explanation: `Shell Sort is a generalization of Insertion Sort. It introduces the concept of a "gap sequence": instead of comparing adjacent elements, it compares elements separated by a gap. The gap starts large (roughly n/2) and shrinks each pass (typically following Knuth's sequence: 1, 4, 13, 40, 121...), until the final pass is standard Insertion Sort (gap = 1).
+    explanation: `Shell Sort ist eine Verallgemeinerung des Insertion Sort. Er führt das Konzept einer „Lückenfolge" ein: Statt benachbarte Elemente zu vergleichen, vergleicht er Elemente mit einem definierten Abstand (Gap). Der Gap beginnt groß (ca. n/2) und schrumpft pro Durchgang (typischerweise nach Knuths Folge: 1, 4, 13, 40, 121 ...), bis der letzte Durchgang ein normaler Insertion Sort (Gap = 1) ist.
 
-**Why it works:** Insertion Sort moves elements only one position at a time. Shell Sort's large initial gaps let elements travel far in one pass, so the array is nearly sorted by the time the gap reaches 1.
+**Warum es funktioniert:** Insertion Sort verschiebt Elemente nur eine Position auf einmal. Shell Sorts große Anfangslücken lassen Elemente weite Strecken in einem Schritt zurücklegen — so ist das Array beim letzten Durchgang bereits nahezu sortiert.
 
-**Gap sequences matter:** Knuth's sequence (used below) gives O(n^1.5) practical performance. Ciura's sequence (1, 4, 10, 23, 57, 132, 301, 701) is empirically optimal.
+**Lückenfolge ist entscheidend:** Knuths Folge (unten verwendet) ergibt O(n^1.5) in der Praxis. Ciuras Folge (1, 4, 10, 23, 57, 132, 301, 701) ist empirisch optimal.
 
-**When to use:** Embedded systems with limited memory and no need for worst-case guarantees.`,
+**Wann verwenden:** Eingebettete Systeme mit begrenztem Speicher und ohne Bedarf an Worst-Case-Garantien.`,
     codeTS: `function shellSort(arr: number[]): number[] {
   const n = arr.length;
-  // Knuth's gap sequence: 1, 4, 13, 40, 121, ...
+  // Knuths Lückenfolge: 1, 4, 13, 40, 121, ...
   let gap = 1;
   while (gap < n / 3) gap = gap * 3 + 1;
 
@@ -252,17 +252,17 @@ function heapify(arr: number[], n: number, i: number): void {
     slug: 'counting-sort',
     name: 'Counting Sort',
     category: 'Non-Comparison',
-    shortDescription: 'Counts occurrences of each distinct value, then reconstructs the sorted array — linear time but limited to integer keys in a bounded range.',
+    shortDescription: 'Zählt das Vorkommen jedes Wertes und rekonstruiert daraus das sortierte Array — lineare Laufzeit, aber auf Integer-Schlüssel in einem begrenzten Bereich beschränkt.',
     complexity: { best: 'O(n + k)', average: 'O(n + k)', worst: 'O(n + k)', space: 'O(k)' },
     stable: true,
     inPlace: false,
-    explanation: `Counting Sort breaks the O(n log n) comparison-sort barrier by not comparing elements. It counts how many times each integer value appears in the input, accumulates those counts to get positions, then places each element directly into its correct output position.
+    explanation: `Counting Sort durchbricht die O(n log n)-Schranke vergleichsbasierter Sortierung, indem er Elemente gar nicht vergleicht. Er zählt, wie oft jeder ganzzahlige Wert in der Eingabe vorkommt, akkumuliert diese Zählungen zu Positionen und platziert jedes Element direkt an seine korrekte Ausgabeposition.
 
-**k = range of input values.** If the input has n elements ranging from 0 to k, the algorithm runs in O(n + k) time and O(k) space. When k = O(n), this is linear.
+**k = Wertebereich der Eingabe.** Bei n Elementen im Bereich 0 bis k läuft der Algorithmus in O(n + k) Zeit und O(k) Speicher. Wenn k = O(n) ist, ergibt sich eine lineare Laufzeit.
 
-**Stability:** By iterating the output reconstruction backwards, equal elements preserve their original relative order — essential when used as a subroutine inside Radix Sort.
+**Stabilität:** Durch rückwärts iterierte Ausgabebefüllung behalten gleiche Elemente ihre ursprüngliche Reihenfolge — wichtig, wenn er als Unterroutine in Radix Sort eingesetzt wird.
 
-**When to use:** Sorting integers in a known, bounded range. Classic use: sorting exam scores (0–100), ages (0–150), or as the inner loop of Radix Sort. Breaks down when k >> n.`,
+**Wann verwenden:** Sortieren von Ganzzahlen in einem bekannten, begrenzten Bereich. Klassische Anwendung: Noten (0–100), Alterswerte (0–150) oder als innere Schleife von Radix Sort. Ungeeignet, wenn k >> n ist.`,
     codeTS: `function countingSort(arr: number[]): number[] {
   if (arr.length === 0) return arr;
   const max = Math.max(...arr);
@@ -271,13 +271,13 @@ function heapify(arr: number[], n: number, i: number): void {
   const count = new Array(range).fill(0);
   const output = new Array(arr.length);
 
-  // Count occurrences
+  // Vorkommen zählen
   for (const val of arr) count[val - min]++;
 
-  // Cumulative count (positions)
+  // Kumulative Zählungen (Positionen)
   for (let i = 1; i < range; i++) count[i] += count[i - 1];
 
-  // Build output (backwards for stability)
+  // Ausgabe rückwärts aufbauen (für Stabilität)
   for (let i = arr.length - 1; i >= 0; i--) {
     output[--count[arr[i] - min]] = arr[i];
   }
@@ -288,17 +288,17 @@ function heapify(arr: number[], n: number, i: number): void {
     slug: 'radix-sort',
     name: 'Radix Sort',
     category: 'Non-Comparison',
-    shortDescription: 'Sorts integers digit by digit from least significant to most significant, using a stable sort (Counting Sort) at each digit position.',
+    shortDescription: 'Sortiert Ganzzahlen stelle für stelle von der niedrigsten zur höchsten Stelle — nutzt an jeder Stelle einen stabilen Algorithmus (Counting Sort).',
     complexity: { best: 'O(nk)', average: 'O(nk)', worst: 'O(nk)', space: 'O(n + k)' },
     stable: true,
     inPlace: false,
-    explanation: `Radix Sort processes numbers digit by digit rather than comparing full values. Starting from the least significant digit (LSD variant), it groups elements by that digit using a stable sort (Counting Sort), then repeats for each more significant digit. After processing all d digits, the array is fully sorted.
+    explanation: `Radix Sort verarbeitet Zahlen stelle für stelle statt vollständige Werte zu vergleichen. Beginnend bei der niedrigstwertigen Stelle (LSD-Variante) gruppiert er Elemente nach dieser Stelle mit einem stabilen Sortierverfahren (Counting Sort) und wiederholt dies für jede höhere Stelle. Nach der Verarbeitung aller d Stellen ist das Array vollständig sortiert.
 
-**Why LSD works:** Because Counting Sort is stable, equal digits at the current position preserve their relative order from the previous pass. Over all passes, this builds the correct full ordering.
+**Warum LSD funktioniert:** Da Counting Sort stabil ist, bewahren gleiche Ziffern an der aktuellen Stelle ihre relative Reihenfolge aus dem vorherigen Durchgang. Über alle Durchgänge hinweg entsteht so die korrekte Gesamtordnung.
 
-**Complexity:** O(nk) where k is the number of digits (log₁₀(max)). For 32-bit integers processed in base 256 (4 passes), this is effectively O(4n) = O(n).
+**Komplexität:** O(nk), wobei k die Anzahl der Stellen ist (log₁₀(max)). Für 32-Bit-Ganzzahlen in Basis 256 (4 Durchgänge) ist dies effektiv O(4n) = O(n).
 
-**When to use:** Large arrays of integers or fixed-length strings where the key length k is small relative to n. Used in suffix array construction and some database systems.`,
+**Wann verwenden:** Große Arrays von Ganzzahlen oder gleichlangen Zeichenketten, wenn die Schlüssellänge k klein relativ zu n ist. Wird beim Aufbau von Suffix-Arrays und in manchen Datenbanksystemen eingesetzt.`,
     codeTS: `function radixSort(arr: number[]): number[] {
   const max = Math.max(...arr);
   for (let exp = 1; Math.floor(max / exp) > 0; exp *= 10) {
@@ -325,28 +325,28 @@ function countingSortByDigit(arr: number[], exp: number): void {
     slug: 'tim-sort',
     name: 'Tim Sort',
     category: 'Hybrid',
-    shortDescription: 'A hybrid of Merge Sort and Insertion Sort that exploits natural runs in real-world data — the algorithm used in Python and Java.',
+    shortDescription: 'Ein Hybrid aus Merge Sort und Insertion Sort, der natürliche Runs in realen Daten ausnutzt — der Algorithmus, der in Python und Java zum Einsatz kommt.',
     complexity: { best: 'O(n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)' },
     stable: true,
     inPlace: false,
-    explanation: `TimSort was designed by Tim Peters in 2002 for Python's list.sort() and is now also used in Java (Arrays.sort for objects), Android, and Swift. It is a carefully engineered hybrid optimized for real-world data.
+    explanation: `TimSort wurde 2002 von Tim Peters für Pythons list.sort() entwickelt und wird heute auch in Java (Arrays.sort für Objekte), Android und Swift verwendet. Es handelt sich um einen sorgfältig optimierten Hybridalgorithmus für reale Daten.
 
-**How it works:** (1) Scan the input for "runs" — naturally ascending or descending sequences. Extend short runs to a minimum size (minrun, typically 32–64) using Insertion Sort. (2) Maintain a stack of runs and merge adjacent runs using Merge Sort's merge step, following invariants that keep the stack balanced.
+**Funktionsweise:** (1) Die Eingabe wird nach „Runs" durchsucht — natürlich aufsteigende oder absteigende Sequenzen. Absteigende Runs werden umgekehrt. Zu kurze Runs werden bis zu einer Mindestgröße (minrun, typischerweise 32–64) per Insertion Sort verlängert. (2) Ein Stack von Runs wird verwaltet; benachbarte Runs werden per Merge-Sort-Schritt zusammengeführt, wobei Invarianten den Stack ausbalanciert halten.
 
-**Why it wins in practice:** Real-world data is rarely random — it often has partially sorted regions. TimSort exploits these "runs" to reduce comparisons dramatically, achieving O(n) on already-sorted input.
+**Warum er in der Praxis überlegen ist:** Reale Daten sind selten zufällig — sie enthalten häufig teilweise sortierte Bereiche. TimSort nutzt diese Runs, um Vergleiche drastisch zu reduzieren, und erreicht bei bereits sortierten Eingaben O(n).
 
-**Note:** The implementation below is an educational simplified version. The full production TimSort includes additional optimizations like galloping mode and precise minrun calculation.`,
+**Hinweis:** Die unten gezeigte Implementierung ist eine vereinfachte Lehrversion. Der vollständige Produktions-TimSort enthält weitere Optimierungen wie Galloping-Modus und präzise Minrun-Berechnung.`,
     codeTS: `const MIN_MERGE = 32;
 
 function timSort(arr: number[]): number[] {
   const n = arr.length;
 
-  // Sort subarrays of size MIN_MERGE using insertion sort
+  // Teilarrays der Größe MIN_MERGE per Insertion Sort sortieren
   for (let i = 0; i < n; i += MIN_MERGE) {
     insertionSortRange(arr, i, Math.min(i + MIN_MERGE - 1, n - 1));
   }
 
-  // Merge sorted subarrays bottom-up
+  // Sortierte Teilarrays schrittweise zusammenführen
   for (let size = MIN_MERGE; size < n; size *= 2) {
     for (let left = 0; left < n; left += 2 * size) {
       const mid = Math.min(left + size - 1, n - 1);

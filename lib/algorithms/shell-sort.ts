@@ -13,7 +13,7 @@ export function* shellSortSteps(input: number[]): Generator<SortStep> {
     yield {
       bars: [...arr],
       states: arr.map(() => 'default'),
-      description: `Starting pass with gap = ${gap}`,
+      description: `Neuer Durchgang mit Lücke = ${gap}`,
       comparisons,
       swaps,
     }
@@ -25,7 +25,7 @@ export function* shellSortSteps(input: number[]): Generator<SortStep> {
       yield {
         bars: [...arr],
         states: arr.map((_, idx) => (idx === i ? 'comparing' : 'default')),
-        description: `Inserting ${temp} at index ${i} (gap=${gap})`,
+        description: `Füge ${temp} an Index ${i} ein (Lücke=${gap})`,
         comparisons,
         swaps,
       }
@@ -37,7 +37,7 @@ export function* shellSortSteps(input: number[]): Generator<SortStep> {
         yield {
           bars: [...arr],
           states: arr.map((_, idx) => (idx === j || idx === j - gap ? 'swapping' : 'default')),
-          description: `Shifting ${arr[j - gap]} right by gap ${gap}`,
+          description: `Verschiebe ${arr[j - gap]} um Lücke ${gap} nach rechts`,
           comparisons,
           swaps,
         }
@@ -50,5 +50,5 @@ export function* shellSortSteps(input: number[]): Generator<SortStep> {
     gap = Math.floor(gap / 3)
   }
 
-  yield { bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array is sorted!', comparisons, swaps }
+  yield { bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array ist sortiert!', comparisons, swaps }
 }

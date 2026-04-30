@@ -20,7 +20,7 @@ export function* radixSortSteps(input: number[]): Generator<SortStep> {
     steps.push({
       bars: [...arr],
       states: arr.map(() => 'pivot'),
-      description: `Processing digit at position 10^${Math.log10(exp).toFixed(0)} (exp=${exp})`,
+      description: `Verarbeite Stelle 10^${Math.log10(exp).toFixed(0)} (exp=${exp})`,
       comparisons,
       swaps,
     })
@@ -37,7 +37,7 @@ export function* radixSortSteps(input: number[]): Generator<SortStep> {
           if (idx === pos) return 'swapping'
           return 'sorted'
         }),
-        description: `Placed ${arr[i]} (digit=${digit}) at position ${pos}`,
+        description: `${arr[i]} (Ziffer=${digit}) an Position ${pos} gesetzt`,
         comparisons,
         swaps,
       })
@@ -48,7 +48,7 @@ export function* radixSortSteps(input: number[]): Generator<SortStep> {
     steps.push({
       bars: [...arr],
       states: arr.map(() => 'comparing'),
-      description: `Pass complete — array sorted by digit 10^${Math.log10(exp).toFixed(0)}`,
+      description: `Durchgang abgeschlossen — nach Stelle 10^${Math.log10(exp).toFixed(0)} sortiert`,
       comparisons,
       swaps,
     })
@@ -59,7 +59,7 @@ export function* radixSortSteps(input: number[]): Generator<SortStep> {
     countingSortByDigit(exp)
   }
 
-  steps.push({ bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array is sorted!', comparisons, swaps })
+  steps.push({ bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array ist sortiert!', comparisons, swaps })
 
   for (const step of steps) yield step
 }

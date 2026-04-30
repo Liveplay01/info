@@ -131,7 +131,7 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
       <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
         <span>{currentStepData.description}</span>
         <span>
-          Step {currentStep + 1}/{steps.length} · {currentStepData.comparisons} comparisons · {currentStepData.swaps} swaps
+          Schritt {currentStep + 1}/{steps.length} · {currentStepData.comparisons} Vergleiche · {currentStepData.swaps} Tausche
         </span>
       </div>
 
@@ -149,7 +149,7 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={handlePlayPause} size="sm" variant="default" className="gap-1.5">
           {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-          {isPlaying ? 'Pause' : 'Play'}
+          {isPlaying ? 'Pause' : 'Abspielen'}
         </Button>
         <Button onClick={handleStepBack} size="sm" variant="outline" className="px-2.5" disabled={currentStep === 0}>
           <SkipBack className="h-3.5 w-3.5" />
@@ -159,13 +159,13 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
         </Button>
         <Button onClick={initialize} size="sm" variant="ghost" className="gap-1.5">
           <RotateCcw className="h-3.5 w-3.5" />
-          Reset
+          Zurücksetzen
         </Button>
 
         <div className="flex-1" />
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Speed</span>
+          <span className="text-xs text-muted-foreground">Tempo</span>
           <Slider
             value={[speed]}
             onValueChange={([v]) => setSpeed(v)}
@@ -181,10 +181,10 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="random">Random</SelectItem>
-            <SelectItem value="sorted">Sorted</SelectItem>
-            <SelectItem value="reversed">Reversed</SelectItem>
-            <SelectItem value="nearly-sorted">Nearly Sorted</SelectItem>
+            <SelectItem value="random">Zufällig</SelectItem>
+            <SelectItem value="sorted">Sortiert</SelectItem>
+            <SelectItem value="reversed">Umgekehrt</SelectItem>
+            <SelectItem value="nearly-sorted">Fast sortiert</SelectItem>
           </SelectContent>
         </Select>
 
@@ -205,11 +205,11 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
       {/* Legend */}
       <div className="flex flex-wrap gap-3 pt-1">
         {[
-          { state: 'default' as BarState, label: 'Unsorted' },
-          { state: 'comparing' as BarState, label: 'Comparing' },
-          { state: 'swapping' as BarState, label: 'Swapping' },
-          { state: 'pivot' as BarState, label: 'Pivot / Active' },
-          { state: 'sorted' as BarState, label: 'Sorted' },
+          { state: 'default' as BarState, label: 'Unsortiert' },
+          { state: 'comparing' as BarState, label: 'Vergleich' },
+          { state: 'swapping' as BarState, label: 'Tausch' },
+          { state: 'pivot' as BarState, label: 'Pivot / Aktiv' },
+          { state: 'sorted' as BarState, label: 'Sortiert' },
         ].map(({ state, label }) => (
           <div key={state} className="flex items-center gap-1.5">
             <div className={`h-3 w-3 rounded-sm ${BAR_COLORS[state]}`} />

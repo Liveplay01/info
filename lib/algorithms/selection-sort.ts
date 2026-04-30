@@ -18,7 +18,7 @@ export function* selectionSortSteps(input: number[]): Generator<SortStep> {
     let minIdx = i
     for (let j = i + 1; j < n; j++) {
       comparisons++
-      yield { bars: [...arr], states: makeStates(i, j, minIdx), description: `Scanning: current min is index ${minIdx} (${arr[minIdx]}), comparing with index ${j} (${arr[j]})`, comparisons, swaps }
+      yield { bars: [...arr], states: makeStates(i, j, minIdx), description: `Suche Minimum: aktuell Index ${minIdx} (${arr[minIdx]}), vergleiche mit Index ${j} (${arr[j]})`, comparisons, swaps }
 
       if (arr[j] < arr[minIdx]) {
         minIdx = j
@@ -33,9 +33,9 @@ export function* selectionSortSteps(input: number[]): Generator<SortStep> {
         if (idx === i || idx === minIdx) return 'swapping'
         return 'default'
       })
-      yield { bars: [...arr], states, description: `Placed minimum ${arr[i]} at index ${i}`, comparisons, swaps }
+      yield { bars: [...arr], states, description: `Minimum ${arr[i]} an Position ${i} gesetzt`, comparisons, swaps }
     }
   }
 
-  yield { bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array is sorted!', comparisons, swaps }
+  yield { bars: [...arr], states: arr.map(() => 'sorted'), description: 'Array ist sortiert!', comparisons, swaps }
 }
