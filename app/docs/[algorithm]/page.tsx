@@ -5,6 +5,7 @@ import { algorithms } from '@/lib/algorithm-registry'
 import { SortVisualizerWrapper } from '@/components/sort-visualizer-wrapper'
 import { CodeBlock } from '@/components/code-block'
 import { ComplexityTable } from '@/components/complexity-table'
+import { GlossaryLegend } from '@/components/glossary-legend'
 
 export async function generateStaticParams() {
   return algorithms.map((a) => ({ algorithm: a.slug }))
@@ -83,6 +84,9 @@ export default function AlgorithmPage({ params }: { params: { algorithm: string 
         <h2 className="text-xl font-semibold mb-4">Komplexität</h2>
         <ComplexityTable algo={algo} />
       </section>
+
+      {/* Glossary */}
+      <GlossaryLegend />
 
       {/* Code */}
       <section className="mb-12">
