@@ -10,7 +10,7 @@ export default function PlaygroundPage() {
   return (
     <div className="max-w-4xl">
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6">
-        <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
+        <Link href="/sort" className="hover:text-foreground transition-colors">Sortierung</Link>
         <span>/</span>
         <span className="text-foreground">Playground</span>
       </nav>

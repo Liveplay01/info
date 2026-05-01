@@ -33,11 +33,11 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
     <div className="space-y-6">
       <div>
         <Link
-          href="/docs"
+          href="/sort"
           onClick={onNavigate}
           className={cn(
             'block text-sm py-1.5 px-2 rounded-md transition-colors hover:text-foreground',
-            pathname === '/docs' || pathname === '/docs/'
+            pathname === '/sort' || pathname === '/sort/'
               ? 'text-foreground font-medium bg-accent'
               : 'text-muted-foreground'
           )}
@@ -51,11 +51,11 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
           Werkzeuge
         </p>
         <Link
-          href="/docs/playground"
+          href="/sort/playground"
           onClick={onNavigate}
           className={cn(
             'flex items-center gap-2 text-sm py-1.5 px-2 rounded-md transition-colors hover:text-foreground',
-            pathname === '/docs/playground' || pathname === '/docs/playground/'
+            pathname === '/sort/playground' || pathname === '/sort/playground/'
               ? 'text-foreground font-medium bg-accent'
               : 'text-muted-foreground'
           )}
@@ -64,11 +64,11 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
           Playground
         </Link>
         <Link
-          href="/docs/interview-trainer"
+          href="/sort/interview-trainer"
           onClick={onNavigate}
           className={cn(
             'flex items-center gap-2 text-sm py-1.5 px-2 rounded-md transition-colors hover:text-foreground',
-            pathname === '/docs/interview-trainer' || pathname === '/docs/interview-trainer/'
+            pathname === '/sort/interview-trainer' || pathname === '/sort/interview-trainer/'
               ? 'text-foreground font-medium bg-accent'
               : 'text-muted-foreground'
           )}
@@ -77,11 +77,11 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
           Interview Trainer
         </Link>
         <Link
-          href="/docs/code-diff"
+          href="/sort/code-diff"
           onClick={onNavigate}
           className={cn(
             'flex items-center gap-2 text-sm py-1.5 px-2 rounded-md transition-colors hover:text-foreground',
-            pathname === '/docs/code-diff' || pathname === '/docs/code-diff/'
+            pathname === '/sort/code-diff' || pathname === '/sort/code-diff/'
               ? 'text-foreground font-medium bg-accent'
               : 'text-muted-foreground'
           )}
@@ -98,7 +98,7 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
           </p>
           <ul className="space-y-0.5">
             {group.items.map((algo) => {
-              const href = `/docs/${algo.slug}`
+              const href = `/sort/${algo.slug}`
               const isActive = pathname === href || pathname === `${href}/`
               return (
                 <li key={algo.slug}>

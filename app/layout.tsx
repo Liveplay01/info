@@ -6,10 +6,10 @@ import { ThemeProvider } from '@/components/theme-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'SortDocs – Sortieralgorithmen Bibliothek',
-  description: 'Interaktive Schritt-für-Schritt-Visualisierungen und saubere TypeScript-Implementierungen von 10 klassischen Sortieralgorithmen.',
+  title: '⟨info/⟩ – Java Grundlagen',
+  description: 'Interaktive Java-Lernplattform: Sortieralgorithmen mit Live-Visualisierung und alle Java Array-Typen mit Code-Beispielen.',
   icons: {
-    icon: '/github.svg',
+    icon: '/info-icon.svg',
   },
 }
 

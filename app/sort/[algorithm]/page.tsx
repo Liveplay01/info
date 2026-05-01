@@ -57,7 +57,7 @@ export default function AlgorithmPage({ params }: { params: { algorithm: string 
     <div>
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6">
-        <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
+        <Link href="/sort" className="hover:text-foreground transition-colors">Sortierung</Link>
         <ChevronRight className="h-4 w-4" />
         <span className="text-foreground">{algo.name}</span>
       </nav>
@@ -111,7 +111,7 @@ export default function AlgorithmPage({ params }: { params: { algorithm: string 
           <span>Vergleiche <strong className="text-foreground">{algo.name}</strong> direkt mit einem anderen Algorithmus</span>
         </div>
         <Button variant="outline" size="sm" asChild>
-          <Link href={`/docs/code-diff?a=${algo.slug}`}>Code vergleichen →</Link>
+          <Link href={`/sort/code-diff?a=${algo.slug}`}>Code vergleichen →</Link>
         </Button>
       </div>
 
@@ -124,13 +124,13 @@ export default function AlgorithmPage({ params }: { params: { algorithm: string 
           return (
             <>
               {prev ? (
-                <Link href={`/docs/${prev.slug}`} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                <Link href={`/sort/${prev.slug}`} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
                   <ChevronRight className="h-4 w-4 rotate-180" />
                   {prev.name}
                 </Link>
               ) : <span />}
               {next ? (
-                <Link href={`/docs/${next.slug}`} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                <Link href={`/sort/${next.slug}`} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
                   {next.name}
                   <ChevronRight className="h-4 w-4" />
                 </Link>

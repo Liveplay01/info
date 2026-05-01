@@ -12,16 +12,15 @@ export function Header() {
           <SmartMobileSidebar />
         </div>
 
-        <Link href="/docs" className="flex items-center gap-2 font-semibold">
-          <span className="text-lg">⟨sort/⟩</span>
-          <span className="hidden sm:inline text-muted-foreground font-normal text-sm">SortDocs</span>
+        <Link href="/" className="flex items-center gap-2 font-semibold">
+          <span className="font-mono text-base font-bold">⟨info/⟩</span>
         </Link>
 
         <div className="flex-1" />
 
         <nav className="flex items-center gap-1">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/docs">Dokumentation</Link>
+            <Link href="/sort">Sortierung</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/array">Arrays</Link>

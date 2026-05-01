@@ -13,6 +13,9 @@ export function SmartMobileSidebar() {
   const [open, setOpen] = React.useState(false)
   const pathname = usePathname()
   const isArraySection = pathname.startsWith('/array')
+  const inSection = pathname.startsWith('/array') || pathname.startsWith('/sort')
+
+  if (!inSection) return null
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
