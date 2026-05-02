@@ -24,7 +24,7 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Phase = 'idle' | 'active' | 'completed'
+type Phase = 'idle' | 'countdown' | 'active' | 'completed'
 type CharState = 'untyped' | 'correct' | 'incorrect'
 type Duration = 15 | 30 | 60 | 120
 
@@ -126,6 +126,7 @@ export function TypingTrainer() {
   const [currentStreak, setCurrentStreak] = useState<number>(0)
   const [maxStreak, setMaxStreak] = useState<number>(0)
   const [totalKeystrokes, setTotalKeystrokes] = useState<number>(0)
+  const [countdown, setCountdown] = useState<number>(3)
   const [results, setResults] = useState<RoundResults | null>(null)
   const [isNewBest, setIsNewBest] = useState(false)
   const [levelUp, setLevelUp] = useState<{ from: number; to: number } | null>(null)
@@ -139,6 +140,7 @@ export function TypingTrainer() {
   const startTimeRef = useRef<number>(0)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const wpmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const durationRef = useRef<Duration>(duration)
   const typedRef = useRef<string>('')
   const keystrokesRef = useRef<number>(0)
@@ -203,6 +205,7 @@ export function TypingTrainer() {
   const restart = useCallback((newLang?: TypingLang, newMode?: TypingMode, newDuration?: Duration) => {
     if (timerRef.current) clearInterval(timerRef.current)
     if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current)
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
     const l = newLang ?? lang
     const m = newMode ?? mode
     const d = newDuration ?? duration
@@ -294,17 +297,38 @@ export function TypingTrainer() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completeRound])
 
+  // ── Countdown ─────────────────────────────────────────────────────────────
+  const startCountdown = useCallback(() => {
+    setPhase('countdown')
+    setCountdown(3)
+    let count = 3
+    countdownIntervalRef.current = setInterval(() => {
+      count -= 1
+      if (count <= 0) {
+        clearInterval(countdownIntervalRef.current!)
+        setPhase('active')
+        startTimers()
+      } else {
+        setCountdown(count)
+      }
+    }, 1000)
+  }, [startTimers])
+
   // ── Input handler ──────────────────────────────────────────────────────────
   const handleInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (phase === 'completed') return
+    if (phase === 'completed' || phase === 'countdown') {
+      e.target.value = ''
+      return
+    }
 
     const value = e.target.value
     // Prevent typing past target (with small overflow buffer)
     if (value.length > targetText.length + 5) return
 
     if (phase === 'idle' && value.length > 0) {
-      setPhase('active')
-      startTimers()
+      e.target.value = ''
+      startCountdown()
+      return
     }
 
     const prev = typedRef.current
@@ -546,27 +570,46 @@ export function TypingTrainer() {
             aria-label={lang === 'de' ? 'Tippfeld' : 'Typing input'}
           />
 
-          {/* Idle overlay — first word stays visible via gradient mask */}
+          {/* Idle / Countdown overlay */}
           <AnimatePresence>
             {phase === 'idle' && (
               <motion.div
+                key="idle"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 flex items-end justify-end pb-3 pr-1 bg-card/80 backdrop-blur-sm rounded-lg"
-                style={{
-                  maskImage: 'linear-gradient(to right, transparent 0%, transparent 18%, black 40%)',
-                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 18%, black 40%)',
-                }}
+                className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-lg"
               >
-                <div className="text-right">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {lang === 'de' ? 'Tippen zum Starten' : 'Start typing'}
+                <div className="text-center">
+                  <p className="text-base font-medium text-muted-foreground">
+                    {lang === 'de' ? 'Beliebige Taste zum Starten' : 'Press any key to start'}
                   </p>
-                  <p className="text-xs text-muted-foreground/50 mt-0.5">
-                    Tab / Esc {lang === 'de' ? '→ Neustart' : '→ restart'}
+                  <p className="text-xs text-muted-foreground/60 mt-1">
+                    Tab / Escape {lang === 'de' ? '→ Neustart' : '→ restart'}
                   </p>
                 </div>
+              </motion.div>
+            )}
+            {phase === 'countdown' && (
+              <motion.div
+                key="countdown"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-lg"
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={countdown}
+                    initial={{ scale: 1.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.4, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    className="text-8xl font-bold text-primary tabular-nums select-none"
+                  >
+                    {countdown}
+                  </motion.span>
+                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
