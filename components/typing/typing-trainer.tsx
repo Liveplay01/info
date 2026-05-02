@@ -546,21 +546,25 @@ export function TypingTrainer() {
             aria-label={lang === 'de' ? 'Tippfeld' : 'Typing input'}
           />
 
-          {/* Idle overlay */}
+          {/* Idle overlay — first word stays visible via gradient mask */}
           <AnimatePresence>
             {phase === 'idle' && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-lg"
+                className="absolute inset-0 flex items-end justify-end pb-3 pr-1 bg-card/80 backdrop-blur-sm rounded-lg"
+                style={{
+                  maskImage: 'linear-gradient(to right, transparent 0%, transparent 18%, black 40%)',
+                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 18%, black 40%)',
+                }}
               >
-                <div className="text-center">
-                  <p className="text-base font-medium text-muted-foreground">
-                    {lang === 'de' ? 'Klicken oder tippen zum Starten' : 'Click or start typing'}
+                <div className="text-right">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {lang === 'de' ? 'Tippen zum Starten' : 'Start typing'}
                   </p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">
-                    Tab / Escape {lang === 'de' ? '→ Neustart' : '→ restart'}
+                  <p className="text-xs text-muted-foreground/50 mt-0.5">
+                    Tab / Esc {lang === 'de' ? '→ Neustart' : '→ restart'}
                   </p>
                 </div>
               </motion.div>
