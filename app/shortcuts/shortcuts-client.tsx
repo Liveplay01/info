@@ -1,14 +1,9 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Search, X, Lightbulb } from 'lucide-react'
 import { Header } from '@/components/header'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import {
   shortcuts,
@@ -108,7 +103,7 @@ function ShortcutCard({
   )
 }
 
-// ── Drawer ─────────────────────────────────────────────────────────────────
+// ── Bottom-sheet drawer ────────────────────────────────────────────────────
 
 function ShortcutDrawer({
   shortcut,
@@ -119,43 +114,76 @@ function ShortcutDrawer({
   open: boolean
   onClose: () => void
 }) {
+  // Lock body scroll while open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="sm:max-w-md w-full overflow-y-auto flex flex-col gap-0 p-0">
-        {shortcut && (
-          <>
-            {/* Header area */}
-            <div className="px-6 pt-8 pb-6 border-b border-border">
-              <SheetHeader className="gap-3">
-                <div className="flex items-start gap-3">
-                  <KeyCombo keys={shortcut.keys} large />
-                </div>
-                <div>
-                  <SheetTitle className="text-xl text-left">
-                    {shortcut.name}
-                  </SheetTitle>
-                </div>
-                <div className="flex">
-                  <CategoryBadge category={shortcut.category} />
-                </div>
-              </SheetHeader>
+    <AnimatePresence>
+      {open && shortcut && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            key="backdrop"
+            className="fixed inset-0 z-50 bg-black/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            onClick={onClose}
+          />
+
+          {/* Panel */}
+          <motion.div
+            key="panel"
+            className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-2xl bg-background rounded-t-2xl border-t border-x border-border shadow-2xl flex flex-col max-h-[85dvh]"
+            initial={{ y: '100%', opacity: 0.6 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 32, mass: 0.9 }}
+          >
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 rounded-full bg-border" />
             </div>
 
-            {/* Body */}
-            <div className="px-6 py-6 space-y-6 flex-1">
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 rounded-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Schließen"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            {/* Header */}
+            <div className="px-6 pt-3 pb-5 border-b border-border shrink-0">
+              <div className="flex items-start gap-3 mb-3">
+                <KeyCombo keys={shortcut.keys} large />
+              </div>
+              <h2 className="text-xl font-semibold mb-2">{shortcut.name}</h2>
+              <CategoryBadge category={shortcut.category} />
+            </div>
+
+            {/* Scrollable body */}
+            <div className="overflow-y-auto px-6 py-6 space-y-6">
               {/* Description */}
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
                   Was es macht
                 </h3>
-                <p className="text-sm leading-relaxed text-foreground">
-                  {shortcut.fullDescription}
-                </p>
+                <p className="text-sm leading-relaxed">{shortcut.fullDescription}</p>
               </div>
 
               {/* Tips */}
               {shortcut.tips.length > 0 && (
-                <div>
+                <div className="pb-4">
                   <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5">
                     <Lightbulb className="h-3.5 w-3.5" />
                     Tipps & Tricks
@@ -163,22 +191,18 @@ function ShortcutDrawer({
                   <ul className="space-y-2.5">
                     {shortcut.tips.map((tip, i) => (
                       <li key={i} className="flex gap-2.5 text-sm">
-                        <span className="text-primary mt-0.5 shrink-0 font-mono">
-                          ›
-                        </span>
-                        <span className="leading-relaxed text-muted-foreground">
-                          {tip}
-                        </span>
+                        <span className="text-primary mt-0.5 shrink-0 font-mono">›</span>
+                        <span className="leading-relaxed text-muted-foreground">{tip}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
             </div>
-          </>
-        )}
-      </SheetContent>
-    </Sheet>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   )
 }
 
