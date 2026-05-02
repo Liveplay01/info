@@ -40,6 +40,18 @@ const sections = [
     items: ['Wörter', 'Sätze', 'Code-Begriffe', 'DE / EN'],
     count: '4 Modi',
   },
+  {
+    href: '/shortcuts',
+    label: 'Windows Shortcuts',
+    tag: '⟨keys/⟩',
+    tagColor: 'text-violet-600 dark:text-violet-400',
+    borderColor: 'hover:border-violet-400/60 dark:hover:border-violet-500/60',
+    badgeColor: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300 border-violet-200 dark:border-violet-800',
+    description:
+      'Alle wichtigen Windows-Tastaturkürzel auf einen Blick — nach Häufigkeit sortiert. Mit Suchleiste, Kategorie-Filter und detaillierten Erklärungen zu jedem Shortcut.',
+    items: ['Bearbeiten', 'System', 'Fenster', 'Browser', '+3 weitere'],
+    count: '56 Shortcuts',
+  },
 ]
 
 export default function HomePage() {
