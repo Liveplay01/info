@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ModeToggle } from '@/components/mode-toggle'
 import { WattWiseButton } from '@/components/wattwise-button'
+import { TypingLevelBadge } from '@/components/typing/typing-level-badge'
 
 const sections = [
   {
@@ -125,6 +126,7 @@ export default function HomePage() {
           ⟨info/⟩ ist ein Open-Source-Lernprojekt — gebaut mit Next.js, Tailwind CSS und TypeScript.
         </p>
       </main>
+      <TypingLevelBadge />
     </div>
   )
 }

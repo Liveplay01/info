@@ -33,6 +33,7 @@ interface RoundResults {
   accuracy: number
   maxStreak: number
   xpEarned: number
+  timeBonus: number
   duration: Duration
   mode: TypingMode
   lang: TypingLang
@@ -141,6 +142,7 @@ export function TypingTrainer() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const wpmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const timeLeftRef = useRef<number>(duration)
   const durationRef = useRef<Duration>(duration)
   const typedRef = useRef<string>('')
   const keystrokesRef = useRef<number>(0)
@@ -218,6 +220,7 @@ export function TypingTrainer() {
     maxStreakRef.current = 0
     setPhase('idle')
     setTimeLeft(d)
+    timeLeftRef.current = d
     setLiveWPM(0)
     setAccuracy(100)
     setCurrentStreak(0)
@@ -238,8 +241,10 @@ export function TypingTrainer() {
     const finalAcc = computeAccuracy(typedRef.current, generateTargetText(mode, lang))
     const finalWPM = computeNetWPM(keystrokesRef.current, elapsed, accuracy)
     const mStreak = maxStreakRef.current
+    const timeBonus = timeLeftRef.current > 0 ? Math.round(timeLeftRef.current * 2) : 0
     const xpEarned = Math.round(finalWPM * (durationRef.current / 60) * (accuracy / 100) * 10)
       + Math.floor(mStreak / 5) * 5
+      + timeBonus
 
     const bestKey = `${mode}-${durationRef.current}`
 
@@ -268,7 +273,7 @@ export function TypingTrainer() {
       return updated
     })
 
-    setResults({ wpm: finalWPM, accuracy, maxStreak: mStreak, xpEarned, duration, mode, lang })
+    setResults({ wpm: finalWPM, accuracy, maxStreak: mStreak, xpEarned, timeBonus, duration, mode, lang })
     setPhase('completed')
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accuracy, duration, mode, lang])
@@ -279,12 +284,14 @@ export function TypingTrainer() {
 
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
-        if (t <= 1) {
+        const next = t - 1
+        timeLeftRef.current = next
+        if (next <= 0) {
           clearInterval(timerRef.current!)
           completeRound()
           return 0
         }
-        return t - 1
+        return next
       })
     }, 1000)
 
@@ -720,6 +727,30 @@ function ResultsScreen({
             )}
           </div>
         </motion.div>
+
+        {/* Time bonus banner */}
+        {results.timeBonus > 0 && (
+          <motion.div
+            variants={staggerItem}
+            className="rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-950/30 px-4 py-3 flex items-center gap-3"
+          >
+            <motion.span
+              animate={{ rotate: [0, -15, 15, -8, 8, 0], scale: [1, 1.2, 1] }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-xl"
+            >
+              ⚡
+            </motion.span>
+            <div>
+              <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
+                {isDE ? 'Zeitbonus!' : 'Time bonus!'}
+              </p>
+              <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                {isDE ? `Text vor Ablauf fertig — +${results.timeBonus} XP` : `Finished early — +${results.timeBonus} XP`}
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Main stats */}
         <motion.div variants={staggerItem} className="grid grid-cols-2 sm:grid-cols-4 gap-4">
