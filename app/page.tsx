@@ -27,6 +27,18 @@ const sections = [
     items: ['int[]', 'boolean[]', 'String[]', 'char[]', '+7 weitere'],
     count: '11 Array-Typen',
   },
+  {
+    href: '/typing',
+    label: 'Tippen lernen',
+    tag: '⟨type/⟩',
+    tagColor: 'text-emerald-600 dark:text-emerald-400',
+    borderColor: 'hover:border-emerald-400/60 dark:hover:border-emerald-500/60',
+    badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+    description:
+      'Verbessere deine Tippgeschwindigkeit mit interaktiven Übungen auf Deutsch und Englisch. Mit Live-WPM-Zähler, Streak-System, XP-Fortschritt und persönlichen Bestleistungen.',
+    items: ['Wörter', 'Sätze', 'Code-Begriffe', 'DE / EN'],
+    count: '4 Modi',
+  },
 ]
 
 export default function HomePage() {

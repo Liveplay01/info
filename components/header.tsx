@@ -25,6 +25,9 @@ export function Header() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/array">Arrays</Link>
           </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/typing">Tippen</Link>
+          </Button>
           <WattWiseButton />
           <ModeToggle />
         </nav>
