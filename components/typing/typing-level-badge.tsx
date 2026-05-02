@@ -57,7 +57,7 @@ export function TypingLevelBadge() {
           className="fixed bottom-5 right-5 z-50"
         >
           <Link
-            href="/typing"
+            href="/typing/spiel"
             className="flex items-center gap-3 rounded-xl border bg-card/95 backdrop-blur-sm shadow-lg px-4 py-3 hover:shadow-xl transition-shadow group"
           >
             <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 shrink-0">
