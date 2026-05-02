@@ -9,6 +9,7 @@ import {
   Check, X, ChevronRight, Eye, EyeOff, AlertTriangle,
   Smartphone, Server, ArrowRight,
 } from 'lucide-react'
+import { playClick, playReveal, playComplete } from '@/lib/sounds'
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
 
@@ -85,7 +86,7 @@ function PasswordStrengthDemo() {
           className="w-full pr-10 pl-4 py-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <button
-          onClick={() => setShow((s) => !s)}
+          onClick={() => { playClick(); setShow((s) => !s) }}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
         >
           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -202,14 +203,14 @@ function TwoFactorDemo() {
 
       <div className="flex justify-center gap-3">
         <button
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          onClick={() => { playClick(); setStep((s) => Math.max(0, s - 1)) }}
           disabled={step === 0}
           className="px-4 py-2 text-xs rounded-lg border border-border bg-muted hover:bg-muted/80 disabled:opacity-30 transition-colors"
         >
           ← Zurück
         </button>
         <button
-          onClick={() => setStep((s) => Math.min(2, s + 1))}
+          onClick={() => { playClick(); setStep((s) => Math.min(2, s + 1)) }}
           disabled={step === 2}
           className="px-4 py-2 text-xs rounded-lg bg-rose-500 text-white hover:bg-rose-600 disabled:opacity-30 transition-colors"
         >
@@ -233,7 +234,13 @@ function PhishingEmailDemo() {
   const allRevealed = revealed.length === phishingFlags.length
 
   function toggle(id: string) {
-    setRevealed((r) => (r.includes(id) ? r.filter((x) => x !== id) : [...r, id]))
+    setRevealed((r) => {
+      if (r.includes(id)) return r.filter((x) => x !== id)
+      const next = [...r, id]
+      if (next.length === phishingFlags.length) playComplete()
+      else playReveal()
+      return next
+    })
   }
 
   return (

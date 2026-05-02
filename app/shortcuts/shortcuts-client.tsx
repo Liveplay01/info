@@ -12,6 +12,7 @@ import {
   type WindowsShortcut,
   type ShortcutCategory,
 } from '@/lib/windows-shortcuts'
+import { playClick, playDrawerOpen, playDrawerClose } from '@/lib/sounds'
 
 // ── Key display helpers ────────────────────────────────────────────────────
 
@@ -136,7 +137,7 @@ function ShortcutDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            onClick={onClose}
+            onClick={() => { playDrawerClose(); onClose() }}
           />
 
           {/* Panel */}
@@ -155,7 +156,7 @@ function ShortcutDrawer({
 
             {/* Close button */}
             <button
-              onClick={onClose}
+              onClick={() => { playDrawerClose(); onClose() }}
               className="absolute top-4 right-4 rounded-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Schließen"
             >
@@ -271,7 +272,7 @@ export function ShortcutsClient() {
             />
             {search && (
               <button
-                onClick={() => setSearch('')}
+                onClick={() => { playClick(); setSearch('') }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Suche leeren"
               >
@@ -283,7 +284,7 @@ export function ShortcutsClient() {
           {/* Category pills */}
           <div className="flex gap-2 flex-wrap">
             <button
-              onClick={() => setActiveCategory(null)}
+              onClick={() => { playClick(); setActiveCategory(null) }}
               className={cn(
                 'rounded-full px-3 py-1 text-xs font-semibold border transition-colors',
                 !activeCategory
@@ -299,7 +300,7 @@ export function ShortcutsClient() {
               return (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(isActive ? null : cat)}
+                  onClick={() => { playClick(); setActiveCategory(isActive ? null : cat) }}
                   className={cn(
                     'rounded-full px-3 py-1 text-xs font-semibold border transition-colors',
                     isActive
@@ -324,7 +325,7 @@ export function ShortcutsClient() {
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filtered.map((s) => (
-              <ShortcutCard key={s.id} shortcut={s} onClick={() => setSelected(s)} />
+              <ShortcutCard key={s.id} shortcut={s} onClick={() => { playDrawerOpen(); setSelected(s) }} />
             ))}
           </div>
         ) : (
@@ -345,6 +346,7 @@ export function ShortcutsClient() {
         open={!!selected}
         onClose={() => setSelected(null)}
       />
+
     </div>
   )
 }

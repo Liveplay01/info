@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { SortStep, BarState, GeneratorFn } from '@/lib/algorithms/types'
+import { playSort, playComplete } from '@/lib/sounds'
 
 type InputType = 'random' | 'sorted' | 'reversed' | 'nearly-sorted'
 
@@ -61,6 +62,7 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
   const [steps, setSteps] = React.useState<SortStep[]>([])
   const [currentStep, setCurrentStep] = React.useState(0)
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
+  const stepsRef = React.useRef<SortStep[]>([])
 
   const initialize = React.useCallback(() => {
     const input = generateInput(inputType, arraySize)
@@ -71,6 +73,10 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
   }, [inputType, arraySize, generatorFn])
 
   React.useEffect(() => {
+    stepsRef.current = steps
+  }, [steps])
+
+  React.useEffect(() => {
     initialize()
   }, [initialize])
 
@@ -79,11 +85,21 @@ export function SortVisualizer({ generatorFn }: SortVisualizerProps) {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
         setCurrentStep((prev) => {
-          if (prev >= steps.length - 1) {
+          const all = stepsRef.current
+          if (prev >= all.length - 1) {
             setIsPlaying(false)
+            playComplete()
             return prev
           }
-          return prev + 1
+          const next = prev + 1
+          const step = all[next]
+          if (step) {
+            const swapIdx = step.states.findIndex(s => s === 'swapping')
+            const cmpIdx  = step.states.findIndex(s => s === 'comparing')
+            const idx = swapIdx !== -1 ? swapIdx : cmpIdx
+            if (idx !== -1) playSort(step.bars[idx] / step.bars.length)
+          }
+          return next
         })
       }, speed)
     }

@@ -8,6 +8,7 @@ import {
   Zap, HardDrive, Cpu, Trash2, ChevronRight,
   ArrowRight, AlertTriangle, Check, X, RotateCcw,
 } from 'lucide-react'
+import { playToggleOn, playToggleOff, playFlip, playReveal, playComplete, playClick } from '@/lib/sounds'
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
 
@@ -73,7 +74,11 @@ function StartupListDemo() {
   const [items, setItems] = useState(initialStartup)
 
   function toggle(i: number) {
-    setItems((prev) => prev.map((e, idx) => (idx === i ? { ...e, enabled: !e.enabled } : e)))
+    setItems((prev) => {
+      const next = prev.map((e, idx) => (idx === i ? { ...e, enabled: !e.enabled } : e))
+      if (next[i].enabled) playToggleOn(); else playToggleOff()
+      return next
+    })
   }
 
   const totalEnabled = items.filter((e) => e.enabled).reduce((s, e) => s + e.time, 0)
@@ -305,7 +310,7 @@ function MythCard({ myth, truth, verdict }: { myth: string; truth: string; verdi
     <div
       className="relative cursor-pointer"
       style={{ perspective: 1200 }}
-      onClick={() => setFlipped((f) => !f)}
+      onClick={() => { playFlip(); setFlipped((f) => !f) }}
     >
       <motion.div
         animate={{ rotateY: flipped ? 180 : 0 }}
@@ -386,7 +391,13 @@ function MaintenanceChecklist() {
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   function toggle(i: number) {
-    setChecked((c) => c.includes(i) ? c.filter((x) => x !== i) : [...c, i])
+    setChecked((c) => {
+      if (c.includes(i)) return c.filter((x) => x !== i)
+      const next = [...c, i]
+      if (next.length === maintenanceItems.length) playComplete()
+      else playReveal()
+      return next
+    })
   }
 
   return (
@@ -458,7 +469,7 @@ function MaintenanceChecklist() {
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          onClick={() => setChecked([])}
+          onClick={() => { playClick(); setChecked([]) }}
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mt-2 transition-colors"
         >
           <RotateCcw className="h-3 w-3" /> Zurücksetzen

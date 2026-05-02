@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
+import { playClick } from '@/lib/sounds'
 
 type Tab = 'java' | 'pc'
 
@@ -181,7 +182,7 @@ export function HomeTabs() {
         {(['java', 'pc'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActive(tab)}
+            onClick={() => { playClick(); setActive(tab) }}
             className="relative px-4 py-2.5 font-mono text-sm font-semibold transition-colors"
             style={{
               color: active === tab ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',

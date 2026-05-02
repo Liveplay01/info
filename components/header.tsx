@@ -1,7 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import { ModeToggle } from '@/components/mode-toggle'
 import { SmartMobileSidebar } from '@/components/smart-mobile-sidebar'
 import { WattWiseButton } from '@/components/wattwise-button'
+import { SoundToggle } from '@/components/sound-toggle'
 import { Button } from '@/components/ui/button'
 
 export function Header() {
@@ -29,6 +32,7 @@ export function Header() {
             <Link href="/typing">Tippen</Link>
           </Button>
           <WattWiseButton />
+          <SoundToggle />
           <ModeToggle />
         </nav>
       </div>
