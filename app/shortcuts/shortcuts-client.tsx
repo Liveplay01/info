@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
+import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Search, X, Lightbulb } from 'lucide-react'
+import { Search, X, Lightbulb, Gamepad2 } from 'lucide-react'
 import { Header } from '@/components/header'
 import { cn } from '@/lib/utils'
 import {
@@ -256,6 +257,16 @@ export function ShortcutsClient() {
             {shortcuts.length} Tastaturkürzel nach Häufigkeit sortiert — mit
             Suchleiste, Kategorie-Filter und Erklärungen zu jedem Shortcut.
           </p>
+          <Link
+            href="/shortcuts/trainer"
+            className="inline-flex items-center gap-2 mt-5 px-4 py-2.5 rounded-xl border-2 border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/20 hover:border-violet-400 dark:hover:border-violet-600 transition-all group text-sm font-semibold text-violet-700 dark:text-violet-300"
+          >
+            <Gamepad2 className="h-4 w-4" />
+            Shortcut-Trainer starten
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-200 dark:bg-violet-800 text-violet-700 dark:text-violet-300 font-semibold leading-none">
+              Game
+            </span>
+          </Link>
         </div>
 
         {/* Search + filter — sticky below header */}
