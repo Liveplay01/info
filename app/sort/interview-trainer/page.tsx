@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { interviewQuestions, InterviewQuestion } from '@/lib/interview-questions'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CheckCircle2, XCircle, ChevronRight, RotateCcw, Trophy } from 'lucide-react'
+import { addXP } from '@/lib/skill-system'
 
 const typeLabels: Record<string, string> = {
   explain: 'Erklären',
@@ -46,6 +47,7 @@ export default function InterviewTrainerPage() {
   const [selected, setSelected] = useState<number | null>(null)
   const [score, setScore] = useState({ correct: 0, total: 0 })
   const [finished, setFinished] = useState(false)
+  const [xpEarned, setXpEarned] = useState(0)
 
   const filteredQueue = filter === 'all' ? queue : queue.filter((q) => q.type === filter)
   const current = filteredQueue[currentIndex]
@@ -72,6 +74,14 @@ export default function InterviewTrainerPage() {
     },
     [isAnswered, current]
   )
+
+  useEffect(() => {
+    if (!finished || score.total === 0) return
+    const earned = Math.round((score.correct / score.total) * 100 * 0.8)
+    setXpEarned(earned)
+    if (earned > 0) addXP('algorithmen', earned)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished])
 
   const handleNext = useCallback(() => {
     if (currentIndex + 1 >= filteredQueue.length) {
@@ -118,6 +128,9 @@ export default function InterviewTrainerPage() {
               ? 'Gut gemacht! Ein paar Themen könnten noch vertieft werden.'
               : 'Weiter üben! Schau dir die Erklärungen auf den Algorithmus-Seiten an.'}
           </p>
+          {xpEarned > 0 && (
+            <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">+{xpEarned} XP Algorithmen</p>
+          )}
           <Button onClick={handleRestart} className="gap-2">
             <RotateCcw className="h-4 w-4" />
             Neu starten

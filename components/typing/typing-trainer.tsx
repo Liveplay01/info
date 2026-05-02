@@ -21,6 +21,7 @@ import {
   type TypingMode,
   type TypingLang,
 } from '@/lib/typing-content'
+import { addXP, loadSkillProgress, getLevelInfo, type LevelInfo } from '@/lib/skill-system'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,42 +38,6 @@ interface RoundResults {
   duration: Duration
   mode: TypingMode
   lang: TypingLang
-}
-
-interface TypingProgress {
-  totalXP: number
-  personalBests: Record<string, number>
-  totalRounds: number
-  lastPlayed: string
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const STORAGE_KEY = 'typing-progress'
-
-function defaultProgress(): TypingProgress {
-  return { totalXP: 0, personalBests: {}, totalRounds: 0, lastPlayed: '' }
-}
-
-function totalXpForLevel(n: number): number {
-  return (n * (n + 1)) / 2 * 100
-}
-
-function getLevelInfo(totalXP: number) {
-  let level = 1
-  while (totalXpForLevel(level + 1) <= totalXP) level++
-  const progressXP = totalXP - totalXpForLevel(level)
-  const neededXP = (level + 1) * 100
-  const names = [
-    '', 'Anfänger', 'Lernender', 'Geübter', 'Fortgeschrittener',
-    'Experte', 'Meister', 'Virtuose', 'Legende', 'Champion', 'Grandmaster',
-  ]
-  return {
-    level,
-    progressXP,
-    neededXP,
-    name: names[Math.min(level, names.length - 1)],
-  }
 }
 
 function computeNetWPM(keystrokes: number, elapsedSeconds: number, accuracy: number): number {
@@ -132,8 +97,10 @@ export function TypingTrainer() {
   const [isNewBest, setIsNewBest] = useState(false)
   const [levelUp, setLevelUp] = useState<{ from: number; to: number } | null>(null)
 
-  // Progress (localStorage, hydrated after mount)
-  const [progress, setProgressState] = useState<TypingProgress | null>(null)
+  // Skill progress (localStorage, hydrated after mount)
+  const [currentLevelInfo, setCurrentLevelInfo] = useState<LevelInfo | null>(null)
+  const personalBestsRef = useRef<Record<string, number>>({})
+  const [personalBests, setPersonalBests] = useState<Record<string, number>>({})
 
   // Refs
   const inputRef = useRef<HTMLInputElement>(null)
@@ -158,19 +125,18 @@ export function TypingTrainer() {
   // Keep durationRef in sync
   useEffect(() => { durationRef.current = duration }, [duration])
 
-  // ── localStorage hydration ─────────────────────────────────────────────────
+  // ── Skill progress hydration ───────────────────────────────────────────────
   useEffect(() => {
+    const sp = loadSkillProgress()
+    setCurrentLevelInfo(getLevelInfo('tippen', sp.skills.tippen.totalXP))
     try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      setProgressState(raw ? JSON.parse(raw) : defaultProgress())
-    } catch {
-      setProgressState(defaultProgress())
-    }
-  }, [])
-
-  const saveProgress = useCallback((updated: TypingProgress) => {
-    setProgressState(updated)
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)) } catch {}
+      const raw = localStorage.getItem('typing-bests')
+      if (raw) {
+        const bests = JSON.parse(raw)
+        personalBestsRef.current = bests
+        setPersonalBests(bests)
+      }
+    } catch {}
   }, [])
 
   // ── Auto-focus on mount ────────────────────────────────────────────────────
@@ -248,30 +214,18 @@ export function TypingTrainer() {
 
     const bestKey = `${mode}-${durationRef.current}`
 
-    setProgressState(prev => {
-      const p = prev ?? defaultProgress()
-      const prevBest = p.personalBests[bestKey] ?? 0
-      const newBest = finalWPM > prevBest
-      const prevLevelInfo = getLevelInfo(p.totalXP)
-      const newTotalXP = p.totalXP + xpEarned
-      const newLevelInfo = getLevelInfo(newTotalXP)
+    // Update personal bests
+    const prevBest = personalBestsRef.current[bestKey] ?? 0
+    const newBests = { ...personalBestsRef.current, [bestKey]: Math.max(prevBest, finalWPM) }
+    personalBestsRef.current = newBests
+    setPersonalBests(newBests)
+    try { localStorage.setItem('typing-bests', JSON.stringify(newBests)) } catch {}
+    setIsNewBest(finalWPM > prevBest)
 
-      const updated: TypingProgress = {
-        totalXP: newTotalXP,
-        personalBests: { ...p.personalBests, [bestKey]: Math.max(prevBest, finalWPM) },
-        totalRounds: p.totalRounds + 1,
-        lastPlayed: new Date().toISOString(),
-      }
-
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)) } catch {}
-
-      setIsNewBest(newBest)
-      if (newLevelInfo.level > prevLevelInfo.level) {
-        setLevelUp({ from: prevLevelInfo.level, to: newLevelInfo.level })
-      }
-
-      return updated
-    })
+    // Update global skill XP
+    const { newProgress, leveledUp, fromLevel, toLevel } = addXP('tippen', xpEarned)
+    setCurrentLevelInfo(getLevelInfo('tippen', newProgress.skills.tippen.totalXP))
+    if (leveledUp) setLevelUp({ from: fromLevel, to: toLevel })
 
     setResults({ wpm: finalWPM, accuracy, maxStreak: mStreak, xpEarned, timeBonus, duration, mode, lang })
     setPhase('completed')
@@ -397,9 +351,9 @@ export function TypingTrainer() {
   }, [restart])
 
   const chars = targetText.split('')
-  const levelInfo = progress ? getLevelInfo(progress.totalXP) : null
+  const levelInfo = currentLevelInfo
   const bestKey = `${mode}-${duration}`
-  const personalBest = progress?.personalBests[bestKey] ?? 0
+  const personalBest = personalBests[bestKey] ?? 0
 
   // ── Render: completed ──────────────────────────────────────────────────────
   if (phase === 'completed' && results) {
@@ -689,7 +643,7 @@ function ResultsScreen({
   isNewBest: boolean
   levelUp: { from: number; to: number } | null
   previousBest: number
-  levelInfo: ReturnType<typeof getLevelInfo> | null
+  levelInfo: LevelInfo | null
   onRestart: () => void
 }) {
   const isDE = results.lang === 'de'
@@ -793,7 +747,7 @@ function ResultsScreen({
                 {isDE ? 'Level aufgestiegen!' : 'Level up!'}
               </p>
               <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                Level {levelUp.from} → {levelUp.to} · {getLevelInfo(0).name}
+                Level {levelUp.from} → {levelUp.to}
               </p>
             </div>
           </motion.div>

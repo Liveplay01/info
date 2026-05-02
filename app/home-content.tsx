@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
 import { Header } from '@/components/header'
-import { TypingLevelBadge } from '@/components/typing/typing-level-badge'
+import { SkillBadge } from '@/components/skills/skill-badge'
 import { Gamepad2 } from 'lucide-react'
 
 // ── Site data ────────────────────────────────────────────────────────────────
@@ -101,21 +101,42 @@ const GAMES = [
     tag: '⟨sort/⟩', tagColor: 'text-blue-400',
     label: 'Interview-Trainer',
     flavor: 'Java · Algorithmen',
-    desc: 'Algorithmus-Fragen unter Zeitdruck beantworten — zur Prüfungsvorbereitung.',
+    desc: 'Algorithmus-Fragen beantworten — zur Prüfungsvorbereitung.',
   },
   {
     href: '/typing/spiel',
     tag: '⟨type/⟩', tagColor: 'text-emerald-400',
     label: 'Tipp-Spiel',
     flavor: 'PC · Tippen',
-    desc: 'Wörter so schnell wie möglich tippen — Streak-Bonus, Level und Highscore.',
+    desc: 'Wörter so schnell wie möglich tippen — Streak-Bonus und Levels.',
   },
   {
     href: '/shortcuts/trainer',
     tag: '⟨keys/⟩', tagColor: 'text-violet-400',
     label: 'Shortcut-Trainer',
     flavor: 'PC · Shortcuts',
-    desc: '60 Sekunden, 4 Antworten — erkenne den richtigen Shortcut. Streak-Multiplikator.',
+    desc: '60 Sekunden, 4 Antworten — erkenne den richtigen Shortcut.',
+  },
+  {
+    href: '/pc/desktop-cleanup',
+    tag: '⟨pc/⟩', tagColor: 'text-amber-400',
+    label: 'Desktop Cleanup',
+    flavor: 'PC · Organisation',
+    desc: 'Chaotische Dateien gegen die Zeit in Ordner sortieren.',
+  },
+  {
+    href: '/shortcuts/rush',
+    tag: '⟨keys/⟩', tagColor: 'text-violet-400',
+    label: 'Shortcut Rush',
+    flavor: 'PC · Effizienz',
+    desc: 'Workflow-Shortcuts mit Combo-Multiplikator meistern.',
+  },
+  {
+    href: '/pc/bug-fixer',
+    tag: '⟨pc/⟩', tagColor: 'text-rose-400',
+    label: 'Bug Fixer',
+    flavor: 'PC · Problemlösung',
+    desc: 'PC-Probleme durch Windows-Navigation lösen — mehrere Wege.',
   },
 ]
 
@@ -123,7 +144,7 @@ const STATS = [
   { value: '10', label: 'Algorithmen' },
   { value: '11', label: 'Array-Typen' },
   { value: '56', label: 'Shortcuts' },
-  { value: '3', label: 'Minigames' },
+  { value: '6', label: 'Minigames' },
 ]
 
 const HERO_CHARS = ['⟨', 'i', 'n', 'f', 'o', '/', '⟩']
@@ -341,17 +362,25 @@ export function HomeContent() {
         {/* Games band */}
         <section className="border-t border-border bg-muted/30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-            <SectionHeading
-              tag="⟨games/⟩"
-              tagColor="text-violet-600 dark:text-violet-400"
-              title="Minigames"
-              subtitle="Lernstoff spielerisch festigen — drei Minigames direkt im Browser, kostenlos."
-            />
+            <div className="flex items-start justify-between mb-8">
+              <SectionHeading
+                tag="⟨games/⟩"
+                tagColor="text-violet-600 dark:text-violet-400"
+                title="Minigames"
+                subtitle="Lernstoff spielerisch festigen — 6 Minigames, Skill-Levels, tägliche Challenges."
+              />
+              <a
+                href="/games"
+                className="shrink-0 mt-1 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:underline hidden sm:block"
+              >
+                Zur Spielhalle →
+              </a>
+            </div>
             <div className="flex items-center gap-2 mb-6 -mt-4">
               <Gamepad2 className="h-4 w-4 text-violet-500" />
               <span className="text-sm text-muted-foreground">Kein Download, kein Login — einfach spielen.</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {GAMES.map((game, i) => (
                 <GameCard key={game.href} game={game} index={i} />
               ))}
@@ -368,7 +397,7 @@ export function HomeContent() {
         </div>
       </footer>
 
-      <TypingLevelBadge />
+      <SkillBadge />
     </div>
   )
 }

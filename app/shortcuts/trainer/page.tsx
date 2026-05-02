@@ -8,6 +8,7 @@ import { Header } from '@/components/header'
 import { shortcuts, categoryConfig, type WindowsShortcut, type ShortcutCategory } from '@/lib/windows-shortcuts'
 import { playCorrect, playWrong, playTick, playGameOver, playClick } from '@/lib/sounds'
 import { cn } from '@/lib/utils'
+import { addXP } from '@/lib/skill-system'
 
 // ── Key display ─────────────────────────────────────────────────────────────
 
@@ -126,6 +127,7 @@ export default function TrainerPage() {
     if (timerRef.current) clearInterval(timerRef.current)
   }, [])
 
+
   function startGame() {
     playClick()
     setScore(0)
@@ -139,6 +141,14 @@ export default function TrainerPage() {
     setQuestion(makeQuestion())
     setPhase('playing')
   }
+
+  // Award XP when game ends
+  useEffect(() => {
+    if (phase !== 'result') return
+    const xpEarned = Math.round(score * 0.5)
+    if (xpEarned > 0) addXP('shortcuts', xpEarned)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
 
   // Countdown timer
   useEffect(() => {
@@ -261,12 +271,13 @@ export default function TrainerPage() {
             <h2 className="text-3xl font-bold mb-2">Zeit abgelaufen!</h2>
             <p className="text-muted-foreground mb-8">So lief deine Runde:</p>
 
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
               {[
                 { label: 'Punkte', value: score, icon: '⭐' },
                 { label: 'Genauigkeit', value: `${accuracy}%`, icon: '🎯' },
                 { label: 'Fragen', value: totalAsked, icon: '❓' },
                 { label: 'Beste Serie', value: bestStreak, icon: '🔥' },
+                { label: 'XP erhalten', value: `+${Math.round(score * 0.5)}`, icon: '✨' },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
