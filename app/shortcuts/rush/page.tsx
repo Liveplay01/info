@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Flame, Trophy, RotateCcw, Zap } from 'lucide-react'
+import { Flame, RotateCcw, Zap, Keyboard } from 'lucide-react'
 import { Header } from '@/components/header'
-import { shortcuts, categoryConfig, type WindowsShortcut } from '@/lib/windows-shortcuts'
+import { shortcuts, type WindowsShortcut } from '@/lib/windows-shortcuts'
 import { WORKFLOWS, type Workflow } from '@/lib/shortcut-rush-workflows'
 import { playCorrect, playWrong, playTick, playGameOver, playClick } from '@/lib/sounds'
 import { addXP } from '@/lib/skill-system'
@@ -13,24 +13,26 @@ import { cn } from '@/lib/utils'
 
 // ── Key display ──────────────────────────────────────────────────────────────
 
-function KeyBadge({ children, large }: { children: string; large?: boolean }) {
+function KeyBadge({ children, large, pressed }: { children: string; large?: boolean; pressed?: boolean }) {
   return (
     <kbd className={cn(
-      'inline-flex items-center justify-center rounded-lg border-2 font-mono font-bold select-none',
-      'bg-muted text-foreground border-border shadow-[0_3px_0_0_hsl(var(--border))]',
+      'inline-flex items-center justify-center rounded-lg border-2 font-mono font-bold select-none transition-all duration-75',
       large ? 'min-w-[3rem] h-12 px-3 text-base' : 'min-w-[2.5rem] h-10 px-2.5 text-sm',
+      pressed
+        ? 'bg-violet-500 text-white border-violet-600 shadow-[0_1px_0_0_hsl(271_81%_40%)] translate-y-[2px]'
+        : 'bg-muted text-foreground border-border shadow-[0_3px_0_0_hsl(var(--border))]',
     )}>
       {children}
     </kbd>
   )
 }
 
-function KeyCombo({ keys, large }: { keys: string[]; large?: boolean }) {
+function KeyCombo({ keys, large, pressedKeys }: { keys: string[]; large?: boolean; pressedKeys?: Set<string> }) {
   return (
     <div className="flex items-center gap-1.5 flex-wrap justify-center">
       {keys.map((key, i) => (
         <Fragment key={i}>
-          <KeyBadge large={large}>{key}</KeyBadge>
+          <KeyBadge large={large} pressed={pressedKeys?.has(key)}>{key}</KeyBadge>
           {i < keys.length - 1 && (
             <span className="text-muted-foreground/60 font-mono text-sm select-none">+</span>
           )}
@@ -40,39 +42,58 @@ function KeyCombo({ keys, large }: { keys: string[]; large?: boolean }) {
   )
 }
 
-// ── Game logic ───────────────────────────────────────────────────────────────
+// ── Key normalization ─────────────────────────────────────────────────────────
+
+const KEY_MAP: Record<string, string> = {
+  Control: 'Ctrl',
+  Shift: 'Shift',
+  Alt: 'Alt',
+  Meta: 'Win',
+  Escape: 'Esc',
+  Delete: 'Entf',
+  ArrowLeft: '←',
+  ArrowRight: '→',
+  ArrowUp: '↑',
+  ArrowDown: '↓',
+  Enter: 'Enter',
+  Tab: 'Tab',
+  Backspace: 'Backspace',
+  ' ': 'Space',
+  PrintScreen: 'Druck',
+  Pause: 'Pause',
+}
+
+function normalizeKey(key: string): string {
+  if (KEY_MAP[key]) return KEY_MAP[key]
+  if (key.length === 1) return key.toUpperCase()
+  return key
+}
+
+function combosMatch(pressed: string[], expected: string[]): boolean {
+  if (pressed.length !== expected.length) return false
+  const ps = new Set(pressed.map(k => k.toLowerCase()))
+  return expected.every(k => ps.has(k.toLowerCase()))
+}
+
+// ── OS-trapped shortcuts (skip from Rush pool) ────────────────────────────────
+
+const BROWSER_TRAPPED = new Set(['win-l', 'alt-f4', 'ctrl-w', 'ctrl-t', 'ctrl-n', 'ctrl-alt-del', 'ctrl-shift-delete'])
+
+// ── Game constants ────────────────────────────────────────────────────────────
 
 const GAME_DURATION = 90
-const FEEDBACK_DELAY = 600
+const FEEDBACK_DELAY = 800
+const STEP_TIMEOUT = 5000
 
 function getShortcutById(id: string): WindowsShortcut | undefined {
   return shortcuts.find(s => s.id === id)
 }
 
-function makeDistractors(correct: WindowsShortcut, count = 3): WindowsShortcut[] {
-  const used = new Set([correct.id])
-  const result: WindowsShortcut[] = []
-  const sameCat = shortcuts.filter(s => s.category === correct.category && !used.has(s.id))
-  const diffCat = shortcuts.filter(s => s.category !== correct.category && !used.has(s.id))
-
-  const fromSame = Math.min(1 + Math.floor(Math.random() * 2), sameCat.length)
-  const sameShuffle = [...sameCat].sort(() => Math.random() - 0.5)
-  for (let i = 0; i < fromSame && result.length < count; i++) {
-    result.push(sameShuffle[i])
-    used.add(sameShuffle[i].id)
-  }
-  const diffShuffle = [...diffCat].sort(() => Math.random() - 0.5)
-  for (let i = 0; result.length < count && i < diffShuffle.length; i++) {
-    if (!used.has(diffShuffle[i].id)) {
-      result.push(diffShuffle[i])
-      used.add(diffShuffle[i].id)
-    }
-  }
-  return result
-}
-
 function getWorkflowsByDifficulty(diff: 1 | 2 | 3): Workflow[] {
-  return WORKFLOWS.filter(w => w.difficulty <= diff)
+  return WORKFLOWS.filter(w =>
+    w.difficulty <= diff &&
+    w.steps.every(step => !BROWSER_TRAPPED.has(step.shortcutId))
+  )
 }
 
 function pickWorkflow(pool: Workflow[]): Workflow {
@@ -84,31 +105,52 @@ function pickWorkflow(pool: Workflow[]): Workflow {
 export default function ShortcutRushPage() {
   const [difficulty, setDifficulty] = useState<1 | 2 | 3>(2)
   const [phase, setPhase] = useState<'idle' | 'playing' | 'result'>('idle')
+  const [isTouchOnly, setIsTouchOnly] = useState(false)
 
   const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null)
   const [currentStepIdx, setCurrentStepIdx] = useState(0)
-  const [options, setOptions] = useState<WindowsShortcut[]>([])
-  const [selected, setSelected] = useState<string | null>(null)
   const [isAnswered, setIsAnswered] = useState(false)
+  const [lastCorrect, setLastCorrect] = useState<boolean | null>(null)
+  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set())
 
   const [score, setScore] = useState(0)
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0)
   const [comboMultiplier, setComboMultiplier] = useState(1)
   const [completedWorkflows, setCompletedWorkflows] = useState(0)
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION)
+  const [stepTimeLeft, setStepTimeLeft] = useState(STEP_TIMEOUT / 1000)
   const [xpEarned, setXpEarned] = useState(0)
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const stepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const modifiersRef = useRef<Set<string>>(new Set())
   const scoreRef = useRef(0)
   const completedRef = useRef(0)
+  const consecutiveRef = useRef(0)
+  const comboRef = useRef(1)
+  const difficultyRef = useRef(difficulty)
+  const currentWorkflowRef = useRef<Workflow | null>(null)
+  const currentStepIdxRef = useRef(0)
+  const isAnsweredRef = useRef(false)
 
   useEffect(() => { scoreRef.current = score }, [score])
   useEffect(() => { completedRef.current = completedWorkflows }, [completedWorkflows])
+  useEffect(() => { consecutiveRef.current = consecutiveCorrect }, [consecutiveCorrect])
+  useEffect(() => { comboRef.current = comboMultiplier }, [comboMultiplier])
+  useEffect(() => { difficultyRef.current = difficulty }, [difficulty])
+  useEffect(() => { currentWorkflowRef.current = currentWorkflow }, [currentWorkflow])
+  useEffect(() => { currentStepIdxRef.current = currentStepIdx }, [currentStepIdx])
+  useEffect(() => { isAnsweredRef.current = isAnswered }, [isAnswered])
+
+  useEffect(() => {
+    setIsTouchOnly('ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches)
+  }, [])
 
   const endGame = useCallback(() => {
     setPhase('result')
     playGameOver()
     if (timerRef.current) clearInterval(timerRef.current)
+    if (stepTimerRef.current) clearInterval(stepTimerRef.current)
   }, [])
 
   useEffect(() => {
@@ -119,6 +161,7 @@ export default function ShortcutRushPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
+  // Global timer
   useEffect(() => {
     if (phase !== 'playing') return
     timerRef.current = setInterval(() => {
@@ -131,84 +174,159 @@ export default function ShortcutRushPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [phase, endGame])
 
-  function loadStep(workflow: Workflow, stepIdx: number) {
-    const step = workflow.steps[stepIdx]
-    if (!step) return
-    const correct = getShortcutById(step.shortcutId)
-    if (!correct) return
-    const distractors = makeDistractors(correct)
-    setOptions([correct, ...distractors].sort(() => Math.random() - 0.5))
-    setSelected(null)
-    setIsAnswered(false)
+  function startStepTimer() {
+    if (stepTimerRef.current) clearInterval(stepTimerRef.current)
+    setStepTimeLeft(STEP_TIMEOUT / 1000)
+    let remaining = STEP_TIMEOUT / 1000
+    stepTimerRef.current = setInterval(() => {
+      remaining -= 1
+      setStepTimeLeft(remaining)
+      if (remaining <= 0) {
+        clearInterval(stepTimerRef.current!)
+        if (!isAnsweredRef.current) handleWrong()
+      }
+    }, 1000)
   }
 
-  function startNewWorkflow(pool: Workflow[]) {
-    const wf = pickWorkflow(pool)
-    setCurrentWorkflow(wf)
-    setCurrentStepIdx(0)
-    loadStep(wf, 0)
+  function handleCorrect(workflow: Workflow, stepIdx: number) {
+    if (isAnsweredRef.current) return
+    isAnsweredRef.current = true
+    setIsAnswered(true)
+    setLastCorrect(true)
+    if (stepTimerRef.current) clearInterval(stepTimerRef.current)
+    playCorrect()
+
+    const newConsecutive = consecutiveRef.current + 1
+    const newMultiplier = 1 + Math.floor(newConsecutive / 3)
+    setConsecutiveCorrect(newConsecutive)
+    setComboMultiplier(newMultiplier)
+    setScore(s => s + 10 * newMultiplier)
+
+    setTimeout(() => {
+      const nextStepIdx = stepIdx + 1
+      const pool = getWorkflowsByDifficulty(difficultyRef.current)
+
+      if (nextStepIdx >= workflow.steps.length) {
+        setCompletedWorkflows(c => c + 1)
+        const wf = pickWorkflow(pool)
+        setCurrentWorkflow(wf)
+        setCurrentStepIdx(0)
+        setIsAnswered(false)
+        setLastCorrect(null)
+        isAnsweredRef.current = false
+        startStepTimer()
+      } else {
+        setCurrentStepIdx(nextStepIdx)
+        setIsAnswered(false)
+        setLastCorrect(null)
+        isAnsweredRef.current = false
+        startStepTimer()
+      }
+    }, FEEDBACK_DELAY)
   }
+
+  function handleWrong() {
+    if (isAnsweredRef.current) return
+    isAnsweredRef.current = true
+    setIsAnswered(true)
+    setLastCorrect(false)
+    if (stepTimerRef.current) clearInterval(stepTimerRef.current)
+    playWrong()
+    setConsecutiveCorrect(0)
+    setComboMultiplier(1)
+
+    setTimeout(() => {
+      const pool = getWorkflowsByDifficulty(difficultyRef.current)
+      const wf = pickWorkflow(pool)
+      setCurrentWorkflow(wf)
+      setCurrentStepIdx(0)
+      setIsAnswered(false)
+      setLastCorrect(null)
+      isAnsweredRef.current = false
+      startStepTimer()
+    }, FEEDBACK_DELAY)
+  }
+
+  // Keyboard detection
+  useEffect(() => {
+    if (phase !== 'playing') return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const MODIFIERS = new Set(['Control', 'Shift', 'Alt', 'Meta'])
+      if (MODIFIERS.has(e.key)) {
+        const normalized = normalizeKey(e.key)
+        modifiersRef.current.add(normalized)
+        setPressedKeys(new Set(Array.from(modifiersRef.current)))
+        return
+      }
+
+      e.preventDefault()
+
+      const wf = currentWorkflowRef.current
+      const stepIdx = currentStepIdxRef.current
+      if (!wf || isAnsweredRef.current) return
+
+      const normalizedKey = normalizeKey(e.key)
+      const pressed = Array.from(modifiersRef.current).concat(normalizedKey)
+      setPressedKeys(new Set(Array.from(modifiersRef.current).concat(normalizedKey)))
+
+      const step = wf.steps[stepIdx]
+      const correct = getShortcutById(step.shortcutId)
+      if (!correct) return
+
+      if (combosMatch(pressed, correct.keys)) {
+        handleCorrect(wf, stepIdx)
+      } else {
+        handleWrong()
+      }
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const normalized = normalizeKey(e.key)
+      modifiersRef.current.delete(normalized)
+      setPressedKeys(new Set(Array.from(modifiersRef.current)))
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+      modifiersRef.current.clear()
+      setPressedKeys(new Set())
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
 
   function startGame() {
     playClick()
     const pool = getWorkflowsByDifficulty(difficulty)
+    const wf = pickWorkflow(pool)
+    modifiersRef.current.clear()
+    scoreRef.current = 0
+    completedRef.current = 0
+    consecutiveRef.current = 0
+    comboRef.current = 1
+    isAnsweredRef.current = false
     setScore(0)
     setConsecutiveCorrect(0)
     setComboMultiplier(1)
     setCompletedWorkflows(0)
     setTimeLeft(GAME_DURATION)
     setXpEarned(0)
-    setPhase('playing')
-    const wf = pickWorkflow(pool)
     setCurrentWorkflow(wf)
     setCurrentStepIdx(0)
-    const step = wf.steps[0]
-    const correct = getShortcutById(step.shortcutId)
-    if (!correct) return
-    const distractors = makeDistractors(correct)
-    setOptions([correct, ...distractors].sort(() => Math.random() - 0.5))
-    setSelected(null)
     setIsAnswered(false)
-  }
-
-  function handleAnswer(opt: WindowsShortcut) {
-    if (isAnswered || !currentWorkflow || phase !== 'playing') return
-    setSelected(opt.id)
-    setIsAnswered(true)
-
-    const step = currentWorkflow.steps[currentStepIdx]
-    const isCorrect = opt.id === step.shortcutId
-
-    if (isCorrect) {
-      playCorrect()
-      const newConsecutive = consecutiveCorrect + 1
-      const newMultiplier = 1 + Math.floor(newConsecutive / 3)
-      setConsecutiveCorrect(newConsecutive)
-      setComboMultiplier(newMultiplier)
-      setScore(s => s + 10 * newMultiplier)
-    } else {
-      playWrong()
-      setConsecutiveCorrect(0)
-      setComboMultiplier(1)
-    }
-
-    setTimeout(() => {
-      const nextStepIdx = currentStepIdx + 1
-      const pool = getWorkflowsByDifficulty(difficulty)
-
-      if (nextStepIdx >= currentWorkflow.steps.length) {
-        // Workflow complete
-        if (isCorrect) setCompletedWorkflows(c => c + 1)
-        startNewWorkflow(pool)
-      } else {
-        setCurrentStepIdx(nextStepIdx)
-        loadStep(currentWorkflow, nextStepIdx)
-      }
-    }, FEEDBACK_DELAY)
+    setLastCorrect(null)
+    setPressedKeys(new Set())
+    setPhase('playing')
+    setTimeout(() => startStepTimer(), 50)
   }
 
   const timerPct = (timeLeft / GAME_DURATION) * 100
   const timerColor = timeLeft > 10 ? 'bg-violet-500' : timeLeft > 5 ? 'bg-amber-500' : 'bg-rose-500'
+  const stepPct = (stepTimeLeft / (STEP_TIMEOUT / 1000)) * 100
+  const stepColor = stepTimeLeft > 3 ? 'bg-violet-400' : stepTimeLeft > 1 ? 'bg-amber-400' : 'bg-rose-500'
 
   // ── Idle ─────────────────────────────────────────────────────────────────
 
@@ -225,13 +343,18 @@ export default function ShortcutRushPage() {
           >
             <div className="font-mono text-sm font-semibold text-violet-600 dark:text-violet-400 mb-3">⟨keys/⟩</div>
             <h1 className="text-4xl font-bold tracking-tight mb-4">Shortcut Rush</h1>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Kein isoliertes Ratespiel — echte Workflows! Mehrere Shortcuts hintereinander korrekt = Combo-Multiplikator.
+            <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
+              Echte Workflows — drücke die geforderte Tastenkombination direkt auf deiner Tastatur!
             </p>
+            <div className="flex items-center justify-center gap-2 mb-6 text-sm text-muted-foreground">
+              <Keyboard className="h-4 w-4" />
+              <span>Physische Tastatur erforderlich</span>
+            </div>
 
             <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs text-muted-foreground">
               <span className="px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 font-medium">Combo 3× = 2x Punkte</span>
               <span className="px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 font-medium">Combo 6× = 3x Punkte</span>
+              <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium">5s pro Schritt</span>
             </div>
 
             <div className="flex justify-center gap-2 mb-8">
@@ -346,6 +469,30 @@ export default function ShortcutRushPage() {
 
   if (!currentWorkflow) return null
   const currentStep = currentWorkflow.steps[currentStepIdx]
+  const correctShortcut = getShortcutById(currentStep.shortcutId)
+
+  if (isTouchOnly) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+          <div className="max-w-sm">
+            <div className="text-5xl mb-6">⌨️</div>
+            <h2 className="text-2xl font-bold mb-3">Physische Tastatur benötigt</h2>
+            <p className="text-muted-foreground mb-6">
+              Shortcut Rush erfordert eine physische Tastatur — auf Touch-Geräten ist das Drücken echter Tastenkombinationen nicht möglich.
+            </p>
+            <button
+              onClick={() => setPhase('idle')}
+              className="px-6 py-3 rounded-xl bg-violet-600 text-white font-bold"
+            >
+              Zurück
+            </button>
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -389,6 +536,7 @@ export default function ShortcutRushPage() {
             </AnimatePresence>
           </div>
 
+          {/* Global timer bar */}
           <div className="h-2 rounded-full bg-muted overflow-hidden">
             <motion.div
               className={`h-full rounded-full transition-colors ${timerColor}`}
@@ -412,7 +560,7 @@ export default function ShortcutRushPage() {
           </div>
         </div>
 
-        {/* Question */}
+        {/* Question + keyboard prompt */}
         <AnimatePresence mode="wait">
           <motion.div
             key={`${currentWorkflow.id}-${currentStepIdx}`}
@@ -422,55 +570,64 @@ export default function ShortcutRushPage() {
             transition={{ duration: 0.2 }}
             className="w-full"
           >
-            <div className="rounded-2xl border-2 border-border bg-card px-6 py-8 mb-6 text-center">
+            {/* Context prompt */}
+            <div className={cn(
+              'rounded-2xl border-2 bg-card px-6 py-8 mb-4 text-center transition-colors duration-200',
+              lastCorrect === true ? 'border-emerald-500 bg-emerald-500/5' : lastCorrect === false ? 'border-rose-500 bg-rose-500/5' : 'border-border',
+            )}>
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-3">
                 Schritt {currentStepIdx + 1} von {currentWorkflow.steps.length}
               </p>
-              <h2 className="text-xl sm:text-2xl font-bold leading-tight">
+              <h2 className="text-xl sm:text-2xl font-bold leading-tight mb-6">
                 {currentStep.contextPrompt}
               </h2>
+
+              {/* Key combination to press */}
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-widest">
+                  {isAnswered
+                    ? lastCorrect ? '✓ Richtig!' : '✗ Falsch — nächster Workflow'
+                    : 'Drücke diese Tasten:'}
+                </p>
+                {correctShortcut && (
+                  <KeyCombo keys={correctShortcut.keys} large pressedKeys={pressedKeys} />
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {options.map((opt) => {
-                const isSelected = selected === opt.id
-                const isCorrect = opt.id === currentStep.shortcutId
-                const showCorrect = isAnswered && isCorrect
-                const showWrong = isAnswered && isSelected && !isCorrect
+            {/* Step countdown bar */}
+            {!isAnswered && (
+              <div className="mb-4">
+                <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                  <span>Zeit für diesen Schritt</span>
+                  <span className={cn('font-mono font-bold', stepTimeLeft <= 1 ? 'text-rose-500' : stepTimeLeft <= 3 ? 'text-amber-500' : '')}>{stepTimeLeft}s</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                  <motion.div
+                    className={`h-full rounded-full transition-colors ${stepColor}`}
+                    animate={{ width: `${stepPct}%` }}
+                    transition={{ duration: 0.9, ease: 'linear' }}
+                  />
+                </div>
+              </div>
+            )}
 
-                return (
-                  <motion.button
-                    key={opt.id}
-                    onClick={() => handleAnswer(opt)}
-                    disabled={isAnswered}
-                    whileHover={isAnswered ? {} : { scale: 1.02 }}
-                    whileTap={isAnswered ? {} : { scale: 0.97 }}
-                    animate={
-                      showCorrect ? { backgroundColor: 'hsl(142 71% 45% / 0.15)', borderColor: 'hsl(142 71% 45%)' }
-                      : showWrong  ? { backgroundColor: 'hsl(0 72% 51% / 0.12)', borderColor: 'hsl(0 72% 51%)' }
-                      : {}
-                    }
-                    transition={{ duration: 0.15 }}
-                    className={cn(
-                      'relative flex flex-col items-center justify-center gap-3 p-5 rounded-xl border-2 transition-colors',
-                      !isAnswered && 'hover:border-violet-400/60 hover:shadow-md cursor-pointer',
-                      !showCorrect && !showWrong && 'border-border bg-card',
-                      isAnswered && 'cursor-not-allowed',
-                    )}
-                  >
-                    <KeyCombo keys={opt.keys} large />
-                    <AnimatePresence>
-                      {showCorrect && (
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2 right-2 text-emerald-500 font-bold text-sm">✓</motion.span>
-                      )}
-                      {showWrong && (
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2 right-2 text-rose-500 font-bold text-sm">✗</motion.span>
-                      )}
-                    </AnimatePresence>
-                  </motion.button>
-                )
-              })}
-            </div>
+            {/* Live pressed keys indicator */}
+            {pressedKeys.size > 0 && !isAnswered && (
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <span>Gedrückt:</span>
+                <div className="flex items-center gap-1">
+                  {Array.from(pressedKeys).map((k, i) => (
+                    <Fragment key={i}>
+                      <kbd className="inline-flex items-center justify-center rounded px-1.5 py-0.5 bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-mono text-xs font-semibold border border-violet-300 dark:border-violet-700">
+                        {k}
+                      </kbd>
+                      {i < pressedKeys.size - 1 && <span className="text-muted-foreground/60">+</span>}
+                    </Fragment>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </main>

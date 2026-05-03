@@ -13,12 +13,15 @@ import { Trophy, RotateCcw, Timer, FolderOpen } from 'lucide-react'
 type FolderId = 'schule' | 'freizeit' | 'arbeit' | 'papierkorb'
 type Phase = 'idle' | 'playing' | 'result'
 
+interface FilePosition { x: number; y: number } // percent of desktop area
+
 interface DesktopFile {
   id: string
   name: string
   ext: 'docx' | 'pdf' | 'png' | 'jpg' | 'xlsx' | 'tmp' | 'txt' | 'exe'
   correctFolder: FolderId
   hint: string
+  position: FilePosition
 }
 
 interface CleanupLevel {
@@ -32,11 +35,11 @@ interface CleanupLevel {
 
 // ── Folder config ────────────────────────────────────────────────────────────
 
-const FOLDERS: { id: FolderId; label: string; icon: string; color: string; bg: string; border: string }[] = [
-  { id: 'schule',    label: 'Schule',     icon: '📚', color: 'text-blue-700 dark:text-blue-300',   bg: 'bg-blue-50 dark:bg-blue-900/20',   border: 'border-blue-300 dark:border-blue-700' },
-  { id: 'freizeit',  label: 'Freizeit',   icon: '🎮', color: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-300 dark:border-emerald-700' },
-  { id: 'arbeit',    label: 'Arbeit',     icon: '💼', color: 'text-amber-700 dark:text-amber-300',  bg: 'bg-amber-50 dark:bg-amber-900/20',  border: 'border-amber-300 dark:border-amber-700' },
-  { id: 'papierkorb', label: 'Papierkorb', icon: '🗑️', color: 'text-rose-700 dark:text-rose-300',   bg: 'bg-rose-50 dark:bg-rose-900/20',   border: 'border-rose-300 dark:border-rose-700' },
+const FOLDERS: { id: FolderId; label: string; icon: string; color: string; bg: string; border: string; glow: string }[] = [
+  { id: 'schule',     label: 'Schule',     icon: '📚', color: 'text-blue-200',   bg: 'bg-blue-900/60',   border: 'border-blue-500',   glow: 'shadow-blue-500/50' },
+  { id: 'freizeit',  label: 'Freizeit',   icon: '🎮', color: 'text-emerald-200', bg: 'bg-emerald-900/60', border: 'border-emerald-500', glow: 'shadow-emerald-500/50' },
+  { id: 'arbeit',    label: 'Arbeit',     icon: '💼', color: 'text-amber-200',   bg: 'bg-amber-900/60',  border: 'border-amber-500',   glow: 'shadow-amber-500/50' },
+  { id: 'papierkorb', label: 'Papierkorb', icon: '🗑️', color: 'text-rose-200',   bg: 'bg-rose-900/60',   border: 'border-rose-500',    glow: 'shadow-rose-500/50' },
 ]
 
 // ── Level data ────────────────────────────────────────────────────────────────
@@ -49,12 +52,12 @@ const LEVELS: CleanupLevel[] = [
     timeLimitSeconds: 90,
     baseXP: 60,
     files: [
-      { id: 'f1', name: 'Hausaufgaben.docx',       ext: 'docx', correctFolder: 'schule',    hint: 'Klingt nach Schularbeit' },
-      { id: 'f2', name: 'urlaub_fotos.png',         ext: 'png',  correctFolder: 'freizeit',  hint: 'Urlaubsfotos gehören zur Freizeit' },
-      { id: 'f3', name: 'rechnung_januar.pdf',      ext: 'pdf',  correctFolder: 'arbeit',    hint: 'Eine Rechnung gehört zur Arbeit' },
-      { id: 'f4', name: 'minecraft_screenshot.png', ext: 'png',  correctFolder: 'freizeit',  hint: 'Spielescreens sind Freizeit' },
-      { id: 'f5', name: 'mathe_aufgaben.pdf',       ext: 'pdf',  correctFolder: 'schule',    hint: 'Mathe-Aufgaben = Schule' },
-      { id: 'f6', name: 'alte_datei.tmp',            ext: 'tmp',  correctFolder: 'papierkorb', hint: 'Temp-Dateien können weg' },
+      { id: 'f1', name: 'Hausaufgaben.docx',       ext: 'docx', correctFolder: 'schule',    hint: 'Klingt nach Schularbeit',      position: { x: 8,  y: 12 } },
+      { id: 'f2', name: 'urlaub_fotos.png',         ext: 'png',  correctFolder: 'freizeit',  hint: 'Urlaubsfotos → Freizeit',      position: { x: 30, y: 28 } },
+      { id: 'f3', name: 'rechnung_januar.pdf',      ext: 'pdf',  correctFolder: 'arbeit',    hint: 'Rechnung → Arbeit',            position: { x: 55, y: 10 } },
+      { id: 'f4', name: 'minecraft_screenshot.png', ext: 'png',  correctFolder: 'freizeit',  hint: 'Spielescreens → Freizeit',     position: { x: 72, y: 32 } },
+      { id: 'f5', name: 'mathe_aufgaben.pdf',       ext: 'pdf',  correctFolder: 'schule',    hint: 'Mathe-Aufgaben → Schule',      position: { x: 18, y: 52 } },
+      { id: 'f6', name: 'alte_datei.tmp',            ext: 'tmp',  correctFolder: 'papierkorb', hint: 'Temp-Dateien können weg',    position: { x: 48, y: 55 } },
     ],
   },
   {
@@ -64,16 +67,16 @@ const LEVELS: CleanupLevel[] = [
     timeLimitSeconds: 90,
     baseXP: 100,
     files: [
-      { id: 'f1', name: 'Hausaufgaben.docx',       ext: 'docx', correctFolder: 'schule',    hint: 'Schularbeit' },
-      { id: 'f2', name: 'urlaub_fotos.png',         ext: 'png',  correctFolder: 'freizeit',  hint: 'Urlaubserinnerungen' },
-      { id: 'f3', name: 'rechnung_januar.pdf',      ext: 'pdf',  correctFolder: 'arbeit',    hint: 'Rechnung → Arbeit' },
-      { id: 'f4', name: 'minecraft_screenshot.png', ext: 'png',  correctFolder: 'freizeit',  hint: 'Spiel → Freizeit' },
-      { id: 'f5', name: 'mathe_aufgaben.pdf',       ext: 'pdf',  correctFolder: 'schule',    hint: 'Mathe → Schule' },
-      { id: 'f6', name: 'alte_datei.tmp',            ext: 'tmp',  correctFolder: 'papierkorb', hint: 'Temp-Datei weg' },
-      { id: 'f7', name: 'neu (1).docx',             ext: 'docx', correctFolder: 'schule',    hint: 'Unbenannte Schulnotiz' },
-      { id: 'f8', name: 'bericht_v3_FINAL.xlsx',    ext: 'xlsx', correctFolder: 'arbeit',    hint: 'Arbeitsbericht' },
-      { id: 'f9', name: 'Kopie von Kopie.png',      ext: 'png',  correctFolder: 'papierkorb', hint: 'Doppelte Kopie → Papierkorb' },
-      { id: 'f10', name: 'final_v2_DEFINITIV.pdf',  ext: 'pdf',  correctFolder: 'arbeit',    hint: 'Finaler Bericht → Arbeit' },
+      { id: 'f1',  name: 'Hausaufgaben.docx',       ext: 'docx', correctFolder: 'schule',     hint: 'Schularbeit',               position: { x: 6,  y: 10 } },
+      { id: 'f2',  name: 'urlaub_fotos.png',         ext: 'png',  correctFolder: 'freizeit',   hint: 'Urlaubserinnerungen',       position: { x: 25, y: 25 } },
+      { id: 'f3',  name: 'rechnung_januar.pdf',      ext: 'pdf',  correctFolder: 'arbeit',     hint: 'Rechnung → Arbeit',         position: { x: 50, y: 10 } },
+      { id: 'f4',  name: 'minecraft_screenshot.png', ext: 'png',  correctFolder: 'freizeit',   hint: 'Spiel → Freizeit',          position: { x: 70, y: 22 } },
+      { id: 'f5',  name: 'mathe_aufgaben.pdf',       ext: 'pdf',  correctFolder: 'schule',     hint: 'Mathe → Schule',            position: { x: 12, y: 42 } },
+      { id: 'f6',  name: 'alte_datei.tmp',            ext: 'tmp',  correctFolder: 'papierkorb', hint: 'Temp-Datei weg',           position: { x: 35, y: 48 } },
+      { id: 'f7',  name: 'neu (1).docx',             ext: 'docx', correctFolder: 'schule',     hint: 'Unbenannte Schulnotiz',     position: { x: 58, y: 42 } },
+      { id: 'f8',  name: 'bericht_v3_FINAL.xlsx',    ext: 'xlsx', correctFolder: 'arbeit',     hint: 'Arbeitsbericht',            position: { x: 76, y: 50 } },
+      { id: 'f9',  name: 'Kopie von Kopie.png',      ext: 'png',  correctFolder: 'papierkorb', hint: 'Doppelte Kopie → Papierkorb', position: { x: 20, y: 62 } },
+      { id: 'f10', name: 'final_v2_DEFINITIV.pdf',   ext: 'pdf',  correctFolder: 'arbeit',     hint: 'Finaler Bericht → Arbeit',  position: { x: 48, y: 65 } },
     ],
   },
   {
@@ -83,20 +86,20 @@ const LEVELS: CleanupLevel[] = [
     timeLimitSeconds: 75,
     baseXP: 150,
     files: [
-      { id: 'f1', name: 'Hausaufgaben.docx',         ext: 'docx', correctFolder: 'schule',    hint: 'Schularbeit' },
-      { id: 'f2', name: 'urlaub_fotos.png',           ext: 'png',  correctFolder: 'freizeit',  hint: 'Urlaubserinnerungen' },
-      { id: 'f3', name: 'rechnung_januar.pdf',        ext: 'pdf',  correctFolder: 'arbeit',    hint: 'Rechnung → Arbeit' },
-      { id: 'f4', name: 'minecraft_screenshot.png',   ext: 'png',  correctFolder: 'freizeit',  hint: 'Spiel → Freizeit' },
-      { id: 'f5', name: 'mathe_aufgaben.pdf',         ext: 'pdf',  correctFolder: 'schule',    hint: 'Mathe → Schule' },
-      { id: 'f6', name: 'alte_datei.tmp',              ext: 'tmp',  correctFolder: 'papierkorb', hint: 'Temp weg' },
-      { id: 'f7', name: 'neu (1).docx',               ext: 'docx', correctFolder: 'schule',    hint: 'Schulnotiz' },
-      { id: 'f8', name: 'bericht_v3_FINAL.xlsx',      ext: 'xlsx', correctFolder: 'arbeit',    hint: 'Arbeitsbericht' },
-      { id: 'f9', name: 'Kopie von Kopie.png',        ext: 'png',  correctFolder: 'papierkorb', hint: 'Doppel-Kopie weg' },
-      { id: 'f10', name: 'final_v2_DEFINITIV.pdf',    ext: 'pdf',  correctFolder: 'arbeit',    hint: 'Bericht → Arbeit' },
-      { id: 'f11', name: 'IMG_20231104.jpg',           ext: 'jpg',  correctFolder: 'freizeit',  hint: 'Kamerafoto → Freizeit' },
-      { id: 'f12', name: 'Unbenannt.docx',             ext: 'docx', correctFolder: 'papierkorb', hint: 'Leer & unbenannt → Weg' },
-      { id: 'f13', name: 'klausurvorbereitung.txt',    ext: 'txt',  correctFolder: 'schule',    hint: 'Klausurvorbereitung = Schule' },
-      { id: 'f14', name: 'spesen_november.xlsx',       ext: 'xlsx', correctFolder: 'arbeit',    hint: 'Spesenliste → Arbeit' },
+      { id: 'f1',  name: 'Hausaufgaben.docx',         ext: 'docx', correctFolder: 'schule',     hint: 'Schularbeit',              position: { x: 5,  y: 10 } },
+      { id: 'f2',  name: 'urlaub_fotos.png',           ext: 'png',  correctFolder: 'freizeit',   hint: 'Urlaubserinnerungen',      position: { x: 22, y: 20 } },
+      { id: 'f3',  name: 'rechnung_januar.pdf',        ext: 'pdf',  correctFolder: 'arbeit',     hint: 'Rechnung → Arbeit',        position: { x: 42, y: 8  } },
+      { id: 'f4',  name: 'minecraft_screenshot.png',   ext: 'png',  correctFolder: 'freizeit',   hint: 'Spiel → Freizeit',         position: { x: 62, y: 18 } },
+      { id: 'f5',  name: 'mathe_aufgaben.pdf',         ext: 'pdf',  correctFolder: 'schule',     hint: 'Mathe → Schule',           position: { x: 78, y: 8  } },
+      { id: 'f6',  name: 'alte_datei.tmp',              ext: 'tmp',  correctFolder: 'papierkorb', hint: 'Temp weg',                 position: { x: 10, y: 35 } },
+      { id: 'f7',  name: 'neu (1).docx',               ext: 'docx', correctFolder: 'schule',     hint: 'Schulnotiz',               position: { x: 30, y: 40 } },
+      { id: 'f8',  name: 'bericht_v3_FINAL.xlsx',      ext: 'xlsx', correctFolder: 'arbeit',     hint: 'Arbeitsbericht',           position: { x: 52, y: 35 } },
+      { id: 'f9',  name: 'Kopie von Kopie.png',        ext: 'png',  correctFolder: 'papierkorb', hint: 'Doppel-Kopie weg',         position: { x: 70, y: 40 } },
+      { id: 'f10', name: 'final_v2_DEFINITIV.pdf',     ext: 'pdf',  correctFolder: 'arbeit',     hint: 'Bericht → Arbeit',         position: { x: 15, y: 58 } },
+      { id: 'f11', name: 'IMG_20231104.jpg',            ext: 'jpg',  correctFolder: 'freizeit',   hint: 'Kamerafoto → Freizeit',    position: { x: 38, y: 62 } },
+      { id: 'f12', name: 'Unbenannt.docx',              ext: 'docx', correctFolder: 'papierkorb', hint: 'Leer & unbenannt → Weg',   position: { x: 58, y: 56 } },
+      { id: 'f13', name: 'klausurvorbereitung.txt',     ext: 'txt',  correctFolder: 'schule',     hint: 'Klausurvorbereitung = Schule', position: { x: 76, y: 60 } },
+      { id: 'f14', name: 'spesen_november.xlsx',        ext: 'xlsx', correctFolder: 'arbeit',     hint: 'Spesenliste → Arbeit',     position: { x: 5,  y: 70 } },
     ],
   },
 ]
@@ -113,16 +116,22 @@ export default function DesktopCleanupPage() {
   const [phase, setPhase] = useState<Phase>('idle')
   const [selectedLevel, setSelectedLevel] = useState<1 | 2 | 3>(1)
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null)
+  const [draggingFileId, setDraggingFileId] = useState<string | null>(null)
+  const [hoverFolderId, setHoverFolderId] = useState<FolderId | null>(null)
   const [placements, setPlacements] = useState<Record<string, FolderId>>({})
   const [wrongMoves, setWrongMoves] = useState(0)
   const [timeLeft, setTimeLeft] = useState(90)
   const [flashFolderId, setFlashFolderId] = useState<FolderId | null>(null)
   const [xpEarned, setXpEarned] = useState(0)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const level = LEVELS[selectedLevel - 1]
-
   const remainingFiles = level.files.filter(f => !placements[f.id])
+
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window)
+  }, [])
 
   const endGame = useCallback((won: boolean) => {
     if (timerRef.current) clearInterval(timerRef.current)
@@ -131,6 +140,7 @@ export default function DesktopCleanupPage() {
       const file = level.files.find(f => f.id === id)
       return file && file.correctFolder === fid
     }).length
+    void placedCorrect
     const earned = Math.max(10, level.baseXP + Math.max(0, timeLeft * 2) - wrongMoves * 10)
     setXpEarned(earned)
     addXP('organisation', earned)
@@ -152,26 +162,21 @@ export default function DesktopCleanupPage() {
     playClick()
     setPlacements({})
     setSelectedFileId(null)
+    setDraggingFileId(null)
+    setHoverFolderId(null)
     setWrongMoves(0)
     setTimeLeft(level.timeLimitSeconds)
     setXpEarned(0)
     setPhase('playing')
   }
 
-  function handleFileClick(fileId: string) {
-    if (phase !== 'playing') return
-    playClick()
-    setSelectedFileId(prev => prev === fileId ? null : fileId)
-  }
-
-  function handleFolderClick(folderId: FolderId) {
-    if (!selectedFileId || phase !== 'playing') return
-    const file = level.files.find(f => f.id === selectedFileId)
+  function placeFile(fileId: string, folderId: FolderId) {
+    const file = level.files.find(f => f.id === fileId)
     if (!file) return
 
     if (file.correctFolder === folderId) {
       playCorrect()
-      const newPlacements = { ...placements, [selectedFileId]: folderId }
+      const newPlacements = { ...placements, [fileId]: folderId }
       setPlacements(newPlacements)
       setSelectedFileId(null)
       if (Object.keys(newPlacements).length === level.files.length) {
@@ -183,6 +188,44 @@ export default function DesktopCleanupPage() {
       setFlashFolderId(folderId)
       setTimeout(() => setFlashFolderId(null), 500)
     }
+  }
+
+  // Touch / click interaction (fallback or primary on touch devices)
+  function handleFileClick(fileId: string) {
+    if (phase !== 'playing') return
+    playClick()
+    setSelectedFileId(prev => prev === fileId ? null : fileId)
+  }
+
+  function handleFolderClick(folderId: FolderId) {
+    if (!selectedFileId || phase !== 'playing') return
+    placeFile(selectedFileId, folderId)
+  }
+
+  // Drag-and-drop handlers
+  function handleDragStart(e: React.DragEvent, fileId: string) {
+    e.dataTransfer.setData('text/plain', fileId)
+    e.dataTransfer.effectAllowed = 'move'
+    setDraggingFileId(fileId)
+  }
+
+  function handleDragEnd() {
+    setDraggingFileId(null)
+    setHoverFolderId(null)
+  }
+
+  function handleFolderDragOver(e: React.DragEvent, folderId: FolderId) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setHoverFolderId(folderId)
+  }
+
+  function handleFolderDrop(e: React.DragEvent, folderId: FolderId) {
+    e.preventDefault()
+    const fileId = e.dataTransfer.getData('text/plain')
+    setDraggingFileId(null)
+    setHoverFolderId(null)
+    if (fileId) placeFile(fileId, folderId)
   }
 
   const timerPct = (timeLeft / level.timeLimitSeconds) * 100
@@ -204,14 +247,14 @@ export default function DesktopCleanupPage() {
             <div className="font-mono text-sm font-semibold text-amber-600 dark:text-amber-400 mb-3">⟨pc/⟩</div>
             <h1 className="text-4xl font-bold tracking-tight mb-4">Desktop Chaos Cleanup</h1>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Dein Desktop ist ein totales Chaos! Sortiere alle Dateien in die richtigen Ordner — so schnell und akkurat wie möglich.
+              Dein Desktop ist ein totales Chaos! Sortiere alle Dateien in die richtigen Ordner — durch Drag & Drop direkt auf dem Desktop.
             </p>
 
             <div className="flex justify-center gap-3 mb-8">
               {FOLDERS.map(f => (
-                <div key={f.id} className={cn('flex flex-col items-center gap-1 px-4 py-3 rounded-xl border-2', f.bg, f.border)}>
+                <div key={f.id} className={cn('flex flex-col items-center gap-1 px-3 py-2 rounded-xl border-2 bg-muted/30', f.border)}>
                   <span className="text-2xl">{f.icon}</span>
-                  <span className={cn('text-xs font-semibold', f.color)}>{f.label}</span>
+                  <span className="text-xs font-semibold text-muted-foreground">{f.label}</span>
                 </div>
               ))}
             </div>
@@ -333,105 +376,150 @@ export default function DesktopCleanupPage() {
     )
   }
 
-  // ── Game screen ────────────────────────────────────────────────────────────
+  // ── Game screen — full visual desktop ─────────────────────────────────────
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 flex flex-col px-4 py-4 max-w-4xl mx-auto w-full gap-4">
+    <div className="fixed inset-0 flex flex-col overflow-hidden select-none" style={{ background: 'linear-gradient(160deg, #1a2744 0%, #0d1b2a 60%, #0a1628 100%)' }}>
 
-        {/* HUD */}
-        <div className="w-full">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5 font-bold text-base">
-              <FolderOpen className="h-4 w-4 text-amber-500" />
-              <span>{remainingFiles.length} übrig</span>
-            </div>
-            <div className={cn('font-mono font-bold text-xl tabular-nums transition-colors', timeLeft <= 10 ? 'text-rose-500' : timeLeft <= 20 ? 'text-amber-500' : 'text-foreground')}>
-              <Timer className="h-4 w-4 inline mr-1" />{timeLeft}s
-            </div>
-            <div className="text-sm text-muted-foreground">
-              ❌ {wrongMoves} Fehler
-            </div>
-          </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <motion.div
-              className={`h-full rounded-full transition-colors ${timerColor}`}
-              animate={{ width: `${timerPct}%` }}
-              transition={{ duration: 0.9, ease: 'linear' }}
-            />
+      {/* HUD bar */}
+      <div className="relative z-50 flex items-center justify-between px-4 py-2 bg-black/40 backdrop-blur-sm border-b border-white/10">
+        <div className="flex items-center gap-1.5 font-bold text-white text-sm">
+          <FolderOpen className="h-4 w-4 text-amber-400" />
+          <span className="text-amber-300">{remainingFiles.length}</span>
+          <span className="text-white/60">übrig</span>
+        </div>
+        <div className={cn('font-mono font-bold text-lg tabular-nums transition-colors', timeLeft <= 10 ? 'text-rose-400' : timeLeft <= 20 ? 'text-amber-400' : 'text-white')}>
+          <Timer className="h-4 w-4 inline mr-1 opacity-70" />{timeLeft}s
+        </div>
+        <div className="text-sm text-white/60">
+          ❌ <span className="text-white/80 font-semibold">{wrongMoves}</span> Fehler
+        </div>
+      </div>
+
+      {/* Timer bar */}
+      <div className="relative z-50 h-1 bg-white/10">
+        <motion.div
+          className={`h-full transition-colors ${timerColor}`}
+          animate={{ width: `${timerPct}%` }}
+          transition={{ duration: 0.9, ease: 'linear' }}
+        />
+      </div>
+
+      {/* Desktop area — files scattered */}
+      <div className="relative flex-1" style={{ paddingBottom: '5.5rem' }}>
+        {/* Subtle desktop grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+        />
+
+        {/* Mission hint */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+          <div className="bg-black/50 backdrop-blur-sm text-white/70 text-xs px-3 py-1 rounded-full border border-white/10">
+            {isTouchDevice ? 'Datei antippen → Ordner antippen' : 'Dateien per Drag & Drop in die Ordner ziehen'}
           </div>
         </div>
 
-        {/* Mission */}
-        <div className="rounded-xl border bg-muted/30 px-4 py-2.5 text-sm text-muted-foreground">
-          <strong className="text-foreground">Mission:</strong> {level.missionDesc}
-          {selectedFileId && (
-            <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">
-              → Jetzt Ordner wählen!
-            </span>
-          )}
-        </div>
+        {/* File icons scattered on desktop */}
+        <AnimatePresence>
+          {remainingFiles.map(file => {
+            const isSelected = selectedFileId === file.id
+            const isDragging = draggingFileId === file.id
 
-        {/* Desktop files */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 min-h-[200px] rounded-xl border-2 border-dashed border-border bg-muted/10 p-3">
-          <AnimatePresence>
-            {remainingFiles.map(file => {
-              const isSelected = selectedFileId === file.id
-              return (
-                <motion.button
-                  key={file.id}
-                  layout
-                  initial={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0, transition: { duration: 0.25 } }}
-                  onClick={() => handleFileClick(file.id)}
+            return (
+              <motion.div
+                key={file.id}
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0, scale: 0, transition: { duration: 0.25 } }}
+                style={{ position: 'absolute', left: `${file.position.x}%`, top: `${file.position.y}%` }}
+              >
+                {/* Use a plain div for HTML5 drag to avoid Framer Motion drag type conflict */}
+                <div
+                  draggable={!isTouchDevice}
+                  onDragStart={isTouchDevice ? undefined : (e: React.DragEvent<HTMLDivElement>) => handleDragStart(e, file.id)}
+                  onDragEnd={isTouchDevice ? undefined : handleDragEnd}
+                  onClick={isTouchDevice ? () => handleFileClick(file.id) : undefined}
                   title={file.hint}
                   className={cn(
-                    'flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all text-center cursor-pointer hover:shadow-md',
-                    isSelected
-                      ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 shadow-md ring-2 ring-amber-400/50'
-                      : 'border-border bg-card hover:border-amber-300'
+                    'flex flex-col items-center gap-1 w-16 transition-transform duration-75 group',
+                    !isTouchDevice && 'cursor-grab active:cursor-grabbing hover:scale-110',
+                    isDragging && 'opacity-50',
+                    isTouchDevice && 'cursor-pointer active:scale-95',
                   )}
                 >
-                  <span className="text-2xl">{EXT_ICONS[file.ext] ?? '📄'}</span>
-                  <span className="text-[10px] font-medium leading-tight break-all line-clamp-2">
+                  {/* Icon */}
+                  <div className={cn(
+                    'w-12 h-12 flex items-center justify-center rounded-lg border-2 transition-all duration-150 text-3xl',
+                    isSelected
+                      ? 'border-amber-400 bg-amber-500/20 shadow-lg shadow-amber-500/30 ring-2 ring-amber-400/40'
+                      : 'border-white/20 bg-white/10 group-hover:border-white/40 group-hover:bg-white/15',
+                  )}>
+                    {EXT_ICONS[file.ext] ?? '📄'}
+                  </div>
+                  {/* Label */}
+                  <span className={cn(
+                    'text-[9px] font-medium text-center leading-tight max-w-[72px] px-1 py-0.5 rounded',
+                    isSelected ? 'bg-amber-500/30 text-amber-200' : 'bg-black/50 text-white/80',
+                    'line-clamp-2 break-all',
+                  )}>
                     {file.name}
                   </span>
-                </motion.button>
-              )
-            })}
-          </AnimatePresence>
-          {remainingFiles.length === 0 && (
-            <div className="col-span-full flex items-center justify-center text-muted-foreground text-sm">
-              Alle Dateien sortiert!
-            </div>
-          )}
-        </div>
-
-        {/* Folder targets */}
-        <div className="grid grid-cols-4 gap-2">
-          {FOLDERS.map(folder => {
-            const isFlashing = flashFolderId === folder.id
-            const isActive = !!selectedFileId
-            return (
-              <motion.button
-                key={folder.id}
-                onClick={() => handleFolderClick(folder.id)}
-                animate={isFlashing ? { backgroundColor: 'hsl(0 72% 51% / 0.2)', borderColor: 'hsl(0 72% 51%)' } : {}}
-                transition={{ duration: 0.15 }}
-                className={cn(
-                  'flex flex-col items-center gap-1.5 py-4 rounded-xl border-2 font-semibold transition-all',
-                  folder.bg, folder.border,
-                  isActive ? 'cursor-pointer hover:scale-105 hover:shadow-lg shadow-sm' : 'opacity-50 cursor-default',
-                )}
-              >
-                <span className="text-3xl">{folder.icon}</span>
-                <span className={cn('text-xs', folder.color)}>{folder.label}</span>
-              </motion.button>
+                </div>
+              </motion.div>
             )
           })}
-        </div>
-      </main>
+        </AnimatePresence>
+
+        {remainingFiles.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-white/60 text-lg font-semibold"
+            >
+              ✨ Desktop aufgeräumt!
+            </motion.div>
+          </div>
+        )}
+      </div>
+
+      {/* Taskbar with folder drop targets */}
+      <div className="relative z-50 h-20 bg-black/60 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-4">
+        {FOLDERS.map(folder => {
+          const isHovered = hoverFolderId === folder.id
+          const isFlashing = flashFolderId === folder.id
+          const isActive = draggingFileId !== null || selectedFileId !== null
+
+          return (
+            <motion.button
+              key={folder.id}
+              onDragOver={isTouchDevice ? undefined : (e) => handleFolderDragOver(e, folder.id)}
+              onDragLeave={isTouchDevice ? undefined : () => setHoverFolderId(null)}
+              onDrop={isTouchDevice ? undefined : (e) => handleFolderDrop(e, folder.id)}
+              onClick={isTouchDevice ? () => handleFolderClick(folder.id) : undefined}
+              animate={
+                isFlashing
+                  ? { borderColor: 'hsl(0 72% 51%)', backgroundColor: 'hsl(0 72% 51% / 0.3)' }
+                  : isHovered
+                  ? { scale: 1.12, borderColor: 'hsl(var(--border))', backgroundColor: 'rgba(255,255,255,0.15)' }
+                  : isActive
+                  ? { scale: 1.04 }
+                  : { scale: 1 }
+              }
+              transition={{ duration: 0.15 }}
+              className={cn(
+                'flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl border-2 transition-colors min-w-[64px]',
+                folder.bg, folder.border,
+                isActive ? 'cursor-pointer shadow-lg' : 'opacity-70',
+                isHovered && `shadow-xl ${folder.glow}`,
+              )}
+            >
+              <span className="text-2xl">{folder.icon}</span>
+              <span className={cn('text-[10px] font-bold', folder.color)}>{folder.label}</span>
+            </motion.button>
+          )
+        })}
+      </div>
     </div>
   )
 }

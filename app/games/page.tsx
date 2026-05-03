@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Header } from '@/components/header'
-import { FolderOpen, Zap, Wrench, Keyboard, Command, GraduationCap } from 'lucide-react'
+import { FolderOpen, Zap, Wrench, Keyboard, Command, GraduationCap, Terminal } from 'lucide-react'
 import { loadSkillProgress, getLevelInfo, type SkillArea, type LevelInfo } from '@/lib/skill-system'
 import { cn } from '@/lib/utils'
 
-// ── Game entries ──────────────────────────────────────────────────────��──────
+// ── Game entries ──────────────────────────────────────────────────────────────
 
 interface GameEntry {
   href: string
@@ -20,23 +20,26 @@ interface GameEntry {
 }
 
 const GAMES: GameEntry[] = [
-  { href: '/sort/interview-trainer', label: 'Interview-Trainer',      emoji: '🧠', skillArea: 'algorithmen',    flavor: 'Java · Algorithmen',   desc: 'Sortieralgorithmen-Quiz für Prüfung & Bewerbung' },
-  { href: '/typing/spiel',           label: 'Tipp-Spiel',             emoji: '⌨️', skillArea: 'tippen',         flavor: 'PC · Tippen',           desc: 'WPM-Trainer mit Streak-Bonus und Levels' },
-  { href: '/shortcuts/trainer',      label: 'Shortcut-Trainer',       emoji: '⚡', skillArea: 'shortcuts',      flavor: 'PC · Shortcuts',        desc: '60s Shortcut-Quiz mit Streak-Multiplikator' },
-  { href: '/pc/desktop-cleanup',     label: 'Desktop Cleanup',        emoji: '🗂️', skillArea: 'organisation',   flavor: 'PC · Organisation',     desc: 'Chaotische Dateien gegen die Zeit sortieren' },
-  { href: '/shortcuts/rush',         label: 'Shortcut Rush',          emoji: '🚀', skillArea: 'effizienz',      flavor: 'PC · Effizienz',        desc: 'Workflow-Shortcuts mit Combo-Multiplikator' },
-  { href: '/pc/bug-fixer',           label: 'Bug Fixer',              emoji: '🛠️', skillArea: 'problemloesung', flavor: 'PC · Problemlösung',    desc: 'PC-Probleme durch Windows-Navigation lösen' },
+  { href: '/sort/interview-trainer', label: 'Interview-Trainer',  emoji: '🧠', skillArea: 'algorithmen',    flavor: 'Java · Algorithmen',   desc: 'Sortieralgorithmen-Quiz für Prüfung & Bewerbung' },
+  { href: '/typing/spiel',           label: 'Tipp-Spiel',         emoji: '⌨️', skillArea: 'tippen',         flavor: 'PC · Tippen',           desc: 'WPM-Trainer mit Streak-Bonus und Levels' },
+  { href: '/typing/race',            label: 'Typing Race',        emoji: '🏁', skillArea: 'tippen',         flavor: 'PC · Tippen',           desc: 'Schreib den Text komplett durch — sty.pe Style' },
+  { href: '/shortcuts/trainer',      label: 'Shortcut-Trainer',   emoji: '⚡', skillArea: 'shortcuts',      flavor: 'PC · Shortcuts',        desc: '60s Shortcut-Quiz — keine Frage doppelt' },
+  { href: '/pc/desktop-cleanup',     label: 'Desktop Cleanup',    emoji: '🗂️', skillArea: 'organisation',   flavor: 'PC · Organisation',     desc: 'Dateien per Drag & Drop auf echtem Desktop sortieren' },
+  { href: '/shortcuts/rush',         label: 'Shortcut Rush',      emoji: '🚀', skillArea: 'effizienz',      flavor: 'PC · Effizienz',        desc: 'Drücke echte Tastenkombinationen im Workflow' },
+  { href: '/pc/bug-fixer',           label: 'Bug Fixer',          emoji: '🛠️', skillArea: 'problemloesung', flavor: 'PC · Problemlösung',    desc: 'PC-Probleme durch Windows-Navigation lösen' },
+  { href: '/cmd/trainer',            label: 'CMD Trainer',        emoji: '💻', skillArea: 'cmd',            flavor: 'PC · Konsole',          desc: '60s CMD-Quiz: Erkenne Windows-Befehle und Syntax' },
 ]
 
-// ── Skill config ────────────────────────────────────────────────────────���────
+// ── Skill config ──────────────────────────────────────────────────────────────
 
 const SKILL_CONFIG: Record<SkillArea, { label: string; Icon: React.ElementType; color: string; bg: string; bar: string }> = {
-  organisation:   { label: 'Organisation',    Icon: FolderOpen,    color: 'text-amber-600 dark:text-amber-400',    bg: 'bg-amber-100 dark:bg-amber-900/30',    bar: 'bg-amber-500' },
-  effizienz:      { label: 'Effizienz',       Icon: Zap,           color: 'text-violet-600 dark:text-violet-400',  bg: 'bg-violet-100 dark:bg-violet-900/30',  bar: 'bg-violet-500' },
-  problemloesung: { label: 'Problemlösung',   Icon: Wrench,        color: 'text-rose-600 dark:text-rose-400',      bg: 'bg-rose-100 dark:bg-rose-900/30',      bar: 'bg-rose-500' },
-  tippen:         { label: 'Tippen',          Icon: Keyboard,      color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30', bar: 'bg-emerald-500' },
-  shortcuts:      { label: 'Shortcuts',       Icon: Command,       color: 'text-blue-600 dark:text-blue-400',      bg: 'bg-blue-100 dark:bg-blue-900/30',      bar: 'bg-blue-500' },
-  algorithmen:    { label: 'Algorithmen',     Icon: GraduationCap, color: 'text-indigo-600 dark:text-indigo-400',  bg: 'bg-indigo-100 dark:bg-indigo-900/30',  bar: 'bg-indigo-500' },
+  organisation:   { label: 'Organisation',  Icon: FolderOpen,    color: 'text-amber-600 dark:text-amber-400',    bg: 'bg-amber-100 dark:bg-amber-900/30',    bar: 'bg-amber-500' },
+  effizienz:      { label: 'Effizienz',     Icon: Zap,           color: 'text-violet-600 dark:text-violet-400',  bg: 'bg-violet-100 dark:bg-violet-900/30',  bar: 'bg-violet-500' },
+  problemloesung: { label: 'Problemlösung', Icon: Wrench,        color: 'text-rose-600 dark:text-rose-400',      bg: 'bg-rose-100 dark:bg-rose-900/30',      bar: 'bg-rose-500' },
+  tippen:         { label: 'Tippen',        Icon: Keyboard,      color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30', bar: 'bg-emerald-500' },
+  shortcuts:      { label: 'Shortcuts',     Icon: Command,       color: 'text-blue-600 dark:text-blue-400',      bg: 'bg-blue-100 dark:bg-blue-900/30',      bar: 'bg-blue-500' },
+  algorithmen:    { label: 'Algorithmen',   Icon: GraduationCap, color: 'text-indigo-600 dark:text-indigo-400',  bg: 'bg-indigo-100 dark:bg-indigo-900/30',  bar: 'bg-indigo-500' },
+  cmd:            { label: 'CMD',           Icon: Terminal,      color: 'text-green-600 dark:text-green-400',    bg: 'bg-green-100 dark:bg-green-900/30',    bar: 'bg-green-500' },
 }
 
 // ── Daily challenge ───────────────────────────────────────────────────────────
@@ -50,13 +53,13 @@ interface DailyChallenge {
 }
 
 const DAILY_TEMPLATES: DailyChallenge[] = [
-  { title: 'Shortcut-Sprint',    desc: 'So viele Shortcuts wie möglich in 60 Sekunden',     href: '/shortcuts/trainer',      skillArea: 'shortcuts',      emoji: '⚡' },
-  { title: 'Tipp-Rekord',        desc: 'Schlage deinen WPM-Rekord im Wörter-Modus (60s)',   href: '/typing/spiel',           skillArea: 'tippen',         emoji: '⌨️' },
-  { title: 'Algorithmus-Quiz',   desc: 'Beantworte Fragen über Sortieralgorithmen',          href: '/sort/interview-trainer', skillArea: 'algorithmen',    emoji: '🧠' },
-  { title: 'Desktop aufräumen',  desc: 'Bestehe Level 2 des Desktop Chaos Cleanup',          href: '/pc/desktop-cleanup',     skillArea: 'organisation',   emoji: '🗂️' },
-  { title: 'Rush Workflow',      desc: 'Schließe möglichst viele Workflows im Shortcut Rush ab', href: '/shortcuts/rush',    skillArea: 'effizienz',      emoji: '🚀' },
-  { title: 'Bug-Jagd',           desc: 'Löse 3 PC-Probleme ohne Hints',                      href: '/pc/bug-fixer',           skillArea: 'problemloesung', emoji: '🛠️' },
-  { title: 'Gemischter Tag',     desc: 'Spiele dein stärktes Minigame und hol dir XP',      href: '/games',                  skillArea: 'tippen',         emoji: '🎮' },
+  { title: 'Shortcut-Sprint',    desc: 'So viele Shortcuts wie möglich in 60 Sekunden',         href: '/shortcuts/trainer', skillArea: 'shortcuts',      emoji: '⚡' },
+  { title: 'Tipp-Rekord',        desc: 'Schlage deinen WPM-Rekord im Wörter-Modus (60s)',       href: '/typing/spiel',      skillArea: 'tippen',         emoji: '⌨️' },
+  { title: 'Algorithmus-Quiz',   desc: 'Beantworte Fragen über Sortieralgorithmen',              href: '/sort/interview-trainer', skillArea: 'algorithmen', emoji: '🧠' },
+  { title: 'Desktop aufräumen',  desc: 'Bestehe Level 2 des Desktop Chaos Cleanup',             href: '/pc/desktop-cleanup', skillArea: 'organisation',  emoji: '🗂️' },
+  { title: 'Rush Workflow',      desc: 'Drücke echte Shortcuts — so viele Workflows wie möglich', href: '/shortcuts/rush',  skillArea: 'effizienz',      emoji: '🚀' },
+  { title: 'Bug-Jagd',           desc: 'Löse 3 PC-Probleme ohne Hints',                         href: '/pc/bug-fixer',      skillArea: 'problemloesung', emoji: '🛠️' },
+  { title: 'CMD-Sprint',         desc: 'Beweise dein CMD-Wissen in 60 Sekunden',                href: '/cmd/trainer',       skillArea: 'cmd',            emoji: '💻' },
 ]
 
 function getDailyChallenge(): DailyChallenge {
@@ -119,7 +122,7 @@ export default function GamesPage() {
         >
           <div className="font-mono text-sm font-semibold text-violet-600 dark:text-violet-400 mb-1">⟨games/⟩</div>
           <h1 className="text-3xl font-bold tracking-tight">Spielhalle</h1>
-          <p className="text-muted-foreground mt-1.5">6 Minigames — Punkte sammeln, Level aufsteigen, besser werden.</p>
+          <p className="text-muted-foreground mt-1.5">8 Minigames — Punkte sammeln, Level aufsteigen, besser werden.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -218,11 +221,13 @@ export default function GamesPage() {
               <p className="font-semibold text-foreground mb-1">So verdienst du XP</p>
               <ul className="space-y-1">
                 <li>⌨️ Tipp-Spiel: WPM × Zeit × Genauigkeit</li>
+                <li>🏁 Typing Race: WPM × Genauigkeit × 0.3</li>
                 <li>⚡ Shortcut-Trainer: Punkte × 0.5</li>
                 <li>🧠 Interview-Trainer: Trefferquote × 80</li>
                 <li>🗂️ Desktop Cleanup: Basis + Speed − Fehler</li>
                 <li>🚀 Shortcut Rush: Score × 0.8 + Workflows × 15</li>
                 <li>🛠️ Bug Fixer: Basis − Hints × 20 + Restzeit</li>
+                <li>💻 CMD Trainer: Punkte × 0.5</li>
               </ul>
             </div>
           </motion.div>

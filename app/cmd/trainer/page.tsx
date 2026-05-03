@@ -1,47 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Flame, Trophy, RotateCcw, Zap } from 'lucide-react'
+import { Flame, RotateCcw, Zap, Terminal } from 'lucide-react'
 import { Header } from '@/components/header'
-import { shortcuts, categoryConfig, type WindowsShortcut, type ShortcutCategory } from '@/lib/windows-shortcuts'
+import { cmdCommands, categoryConfig, type CmdCommand, type CmdCategory } from '@/lib/cmd-commands'
 import { playCorrect, playWrong, playTick, playGameOver, playClick } from '@/lib/sounds'
 import { cn } from '@/lib/utils'
 import { addXP } from '@/lib/skill-system'
 
-// ── Key display ─────────────────────────────────────────────────────────────
-
-function KeyBadge({ children, large }: { children: string; large?: boolean }) {
-  return (
-    <kbd className={cn(
-      'inline-flex items-center justify-center rounded-lg border-2 font-mono font-bold select-none',
-      'bg-muted text-foreground border-border shadow-[0_3px_0_0_hsl(var(--border))]',
-      large ? 'min-w-[3rem] h-12 px-3 text-base' : 'min-w-[2.5rem] h-10 px-2.5 text-sm',
-    )}>
-      {children}
-    </kbd>
-  )
-}
-
-function KeyCombo({ keys, large }: { keys: string[]; large?: boolean }) {
-  return (
-    <div className="flex items-center gap-1.5 flex-wrap justify-center">
-      {keys.map((key, i) => (
-        <Fragment key={i}>
-          <KeyBadge large={large}>{key}</KeyBadge>
-          {i < keys.length - 1 && (
-            <span className="text-muted-foreground/60 font-mono text-sm select-none">+</span>
-          )}
-        </Fragment>
-      ))}
-    </div>
-  )
-}
-
 // ── Game logic ──────────────────────────────────────────────────────────────
 
-function weightedRandom(pool: WindowsShortcut[]): WindowsShortcut {
+function weightedRandom(pool: CmdCommand[]): CmdCommand {
   const total = pool.reduce((s, x) => s + x.frequency, 0)
   let r = Math.random() * total
   for (const x of pool) {
@@ -52,23 +23,22 @@ function weightedRandom(pool: WindowsShortcut[]): WindowsShortcut {
 }
 
 interface Question {
-  correct: WindowsShortcut
-  options: WindowsShortcut[]
+  correct: CmdCommand
+  options: CmdCommand[]
 }
 
 function buildQuestion(askedIds: Set<string>): Question {
-  const remaining = shortcuts.filter(s => !askedIds.has(s.id))
-  const pool = remaining.length > 0 ? remaining : shortcuts
+  const remaining = cmdCommands.filter(c => !askedIds.has(c.id))
+  const pool = remaining.length > 0 ? remaining : cmdCommands
 
   const correct = weightedRandom(pool)
   askedIds.add(correct.id)
 
   const used = new Set([correct.id])
-  const distractors: WindowsShortcut[] = []
+  const distractors: CmdCommand[] = []
 
-  // Prefer same-category distractors (harder), fill rest from other categories
-  const sameCat = shortcuts.filter(s => s.category === correct.category && !used.has(s.id))
-  const diffCat = shortcuts.filter(s => s.category !== correct.category && !used.has(s.id))
+  const sameCat = cmdCommands.filter(c => c.category === correct.category && !used.has(c.id))
+  const diffCat = cmdCommands.filter(c => c.category !== correct.category && !used.has(c.id))
 
   const fromSame = Math.min(1 + Math.floor(Math.random() * 2), sameCat.length)
   const sameShuffle = [...sameCat].sort(() => Math.random() - 0.5)
@@ -89,9 +59,9 @@ function buildQuestion(askedIds: Set<string>): Question {
   return { correct, options }
 }
 
-// ── CategoryBadge ───────────────────────────────────────────────────────────
+// ── Category badge ──────────────────────────────────────────────────────────
 
-function CategoryBadge({ category }: { category: ShortcutCategory }) {
+function CategoryBadge({ category }: { category: CmdCategory }) {
   const cfg = categoryConfig[category]
   return (
     <span className={cn(
@@ -103,6 +73,19 @@ function CategoryBadge({ category }: { category: ShortcutCategory }) {
   )
 }
 
+// ── Command display ──────────────────────────────────────────────────────────
+
+function CmdBadge({ syntax, large }: { syntax: string; large?: boolean }) {
+  return (
+    <code className={cn(
+      'font-mono font-bold rounded-lg border-2 border-border bg-muted px-3 py-1.5 text-foreground break-all',
+      large ? 'text-base' : 'text-sm',
+    )}>
+      {syntax}
+    </code>
+  )
+}
+
 // ── Constants ───────────────────────────────────────────────────────────────
 
 const GAME_DURATION = 60
@@ -110,7 +93,7 @@ const FEEDBACK_DELAY = 680
 
 // ── Main page ───────────────────────────────────────────────────────────────
 
-export default function TrainerPage() {
+export default function CmdTrainerPage() {
   const [phase, setPhase] = useState<'idle' | 'playing' | 'result'>('idle')
   const askedIdsRef = useRef<Set<string>>(new Set())
   const [question, setQuestion] = useState<Question>(() => buildQuestion(new Set()))
@@ -132,7 +115,6 @@ export default function TrainerPage() {
     if (timerRef.current) clearInterval(timerRef.current)
   }, [])
 
-
   function startGame() {
     playClick()
     askedIdsRef.current = new Set()
@@ -148,15 +130,13 @@ export default function TrainerPage() {
     setPhase('playing')
   }
 
-  // Award XP when game ends
   useEffect(() => {
     if (phase !== 'result') return
     const xpEarned = Math.round(score * 0.5)
-    if (xpEarned > 0) addXP('shortcuts', xpEarned)
+    if (xpEarned > 0) addXP('cmd', xpEarned)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
-  // Countdown timer
   useEffect(() => {
     if (phase !== 'playing') return
     timerRef.current = setInterval(() => {
@@ -169,7 +149,7 @@ export default function TrainerPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [phase, endGame])
 
-  function handleAnswer(opt: WindowsShortcut) {
+  function handleAnswer(opt: CmdCommand) {
     if (isAnswered || phase !== 'playing') return
     setSelected(opt.id)
     setIsAnswered(true)
@@ -210,24 +190,26 @@ export default function TrainerPage() {
             transition={{ duration: 0.5 }}
             className="max-w-lg w-full"
           >
-            <div className="font-mono text-sm font-semibold text-violet-600 dark:text-violet-400 mb-3">
-              ⟨trainer/⟩
+            <div className="font-mono text-sm font-semibold text-green-600 dark:text-green-400 mb-3">
+              C:\&gt;_
             </div>
-            <h1 className="text-4xl font-bold tracking-tight mb-4">Shortcut Trainer</h1>
+            <h1 className="text-4xl font-bold tracking-tight mb-4">CMD Trainer</h1>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Sieh die Beschreibung — wähle die richtige Tastenkombination. {GAME_DURATION} Sekunden, so viele wie möglich.
+              Sieh die Beschreibung — wähle den richtigen Befehl. {GAME_DURATION} Sekunden, so viele wie möglich.
             </p>
 
-            {/* Preview of key combos */}
-            <div className="flex flex-wrap justify-center gap-4 mb-10 opacity-60">
-              {[['Ctrl','C'], ['Win','L'], ['Alt','Tab'], ['Ctrl','Shift','Esc']].map((keys, i) => (
+            {/* Preview of commands */}
+            <div className="flex flex-wrap justify-center gap-3 mb-10 opacity-60">
+              {['cd [Pfad]', 'dir', 'mkdir [Name]', 'ipconfig /all'].map((cmd, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
                 >
-                  <KeyCombo keys={keys} />
+                  <code className="font-mono text-sm bg-muted border border-border rounded-lg px-3 py-1.5 text-foreground">
+                    {cmd}
+                  </code>
                 </motion.div>
               ))}
             </div>
@@ -237,15 +219,15 @@ export default function TrainerPage() {
                 onClick={startGame}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-lg shadow-lg shadow-violet-500/20 transition-colors"
+                className="px-8 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg shadow-lg shadow-green-500/20 transition-colors"
               >
-                Starten
+                Training starten
               </motion.button>
               <Link
-                href="/shortcuts"
-                className="px-8 py-3.5 rounded-xl border-2 border-border bg-card hover:border-violet-400/60 font-semibold transition-all text-center"
+                href="/games"
+                className="px-8 py-3.5 rounded-xl border-2 border-border bg-card hover:border-green-400/60 font-semibold transition-all text-center"
               >
-                Zur Shortcut-Bibliothek
+                Zur Spielhalle
               </Link>
             </div>
           </motion.div>
@@ -272,10 +254,10 @@ export default function TrainerPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-5xl mb-6"
             >
-              🏆
+              🖥️
             </motion.div>
             <h2 className="text-3xl font-bold mb-2">Zeit abgelaufen!</h2>
-            <p className="text-muted-foreground mb-8">So lief deine Runde:</p>
+            <p className="text-muted-foreground mb-8">Deine CMD-Bilanz:</p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
               {[
@@ -304,15 +286,15 @@ export default function TrainerPage() {
                 onClick={startGame}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-lg shadow-lg shadow-violet-500/20 transition-colors"
+                className="flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg shadow-lg shadow-green-500/20 transition-colors"
               >
                 <RotateCcw className="h-5 w-5" /> Nochmal
               </motion.button>
               <Link
-                href="/shortcuts"
-                className="px-8 py-3.5 rounded-xl border-2 border-border bg-card hover:border-violet-400/60 font-semibold transition-all text-center"
+                href="/games"
+                className="px-8 py-3.5 rounded-xl border-2 border-border bg-card hover:border-green-400/60 font-semibold transition-all text-center"
               >
-                Zur Bibliothek
+                Zur Spielhalle
               </Link>
             </div>
           </motion.div>
@@ -324,7 +306,7 @@ export default function TrainerPage() {
   // ── Game screen ──────────────────────────────────────────────────────────
 
   const timerPercent = (timeLeft / GAME_DURATION) * 100
-  const timerColor = timeLeft > 10 ? 'bg-violet-500' : timeLeft > 5 ? 'bg-amber-500' : 'bg-rose-500'
+  const timerColor = timeLeft > 10 ? 'bg-green-500' : timeLeft > 5 ? 'bg-amber-500' : 'bg-rose-500'
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -334,7 +316,6 @@ export default function TrainerPage() {
         {/* HUD */}
         <div className="w-full mb-6">
           <div className="flex items-center justify-between mb-2">
-            {/* Score */}
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={score}
@@ -343,29 +324,24 @@ export default function TrainerPage() {
                 transition={{ duration: 0.3 }}
                 className="flex items-center gap-1.5 font-bold text-xl tabular-nums"
               >
-                <Zap className="h-5 w-5 text-violet-500" />
+                <Zap className="h-5 w-5 text-green-500" />
                 {score}
               </motion.div>
             </AnimatePresence>
 
-            {/* Timer */}
-            <div className="flex items-center gap-2">
-              <span className={cn(
-                'font-mono font-bold text-2xl tabular-nums transition-colors',
-                timeLeft <= 5 ? 'text-rose-500' : timeLeft <= 10 ? 'text-amber-500' : 'text-foreground',
-              )}>
-                {timeLeft}s
-              </span>
-            </div>
+            <span className={cn(
+              'font-mono font-bold text-2xl tabular-nums transition-colors',
+              timeLeft <= 5 ? 'text-rose-500' : timeLeft <= 10 ? 'text-amber-500' : 'text-foreground',
+            )}>
+              {timeLeft}s
+            </span>
 
-            {/* Streak */}
             <div className="flex items-center gap-1.5 font-bold text-xl tabular-nums">
               <Flame className={cn('h-5 w-5', streak > 0 ? 'text-orange-500' : 'text-muted-foreground')} />
               <span>{streak}</span>
             </div>
           </div>
 
-          {/* Timer bar */}
           <div className="h-2 rounded-full bg-muted overflow-hidden">
             <motion.div
               className={`h-full rounded-full transition-colors ${timerColor}`}
@@ -391,13 +367,13 @@ export default function TrainerPage() {
                 <CategoryBadge category={question.correct.category} />
               </div>
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-3">
-                Welche Tastenkombination?
+                Welcher Befehl?
               </p>
               <h2 className="text-2xl sm:text-3xl font-bold leading-tight mb-2">
-                {question.correct.name}
+                {question.correct.description}
               </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                {question.correct.shortDesc}
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto font-mono">
+                Beispiel: {question.correct.example}
               </p>
             </div>
 
@@ -425,33 +401,21 @@ export default function TrainerPage() {
                     }
                     transition={{ duration: 0.15 }}
                     className={cn(
-                      'relative flex flex-col items-center justify-center gap-3 p-5 rounded-xl border-2 transition-colors',
-                      !isAnswered && 'hover:border-violet-400/60 hover:shadow-md cursor-pointer',
+                      'relative flex flex-col items-center justify-center gap-2 p-5 rounded-xl border-2 transition-colors',
+                      !isAnswered && 'hover:border-green-400/60 hover:shadow-md cursor-pointer',
                       !showCorrect && !showWrong && 'border-border bg-card',
                       isAnswered && 'cursor-not-allowed',
                     )}
                   >
-                    <KeyCombo keys={opt.keys} large />
+                    <CmdBadge syntax={opt.syntax} large />
+                    <span className="text-xs text-muted-foreground">{opt.command}</span>
 
-                    {/* Feedback icon */}
                     <AnimatePresence>
                       {showCorrect && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute top-2 right-2 text-emerald-500 font-bold text-sm"
-                        >
-                          ✓
-                        </motion.span>
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2 right-2 text-emerald-500 font-bold text-sm">✓</motion.span>
                       )}
                       {showWrong && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute top-2 right-2 text-rose-500 font-bold text-sm"
-                        >
-                          ✗
-                        </motion.span>
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2 right-2 text-rose-500 font-bold text-sm">✗</motion.span>
                       )}
                     </AnimatePresence>
                   </motion.button>

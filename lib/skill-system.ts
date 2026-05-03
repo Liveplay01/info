@@ -5,6 +5,7 @@ export type SkillArea =
   | 'tippen'
   | 'shortcuts'
   | 'algorithmen'
+  | 'cmd'
 
 export interface SkillEntry {
   totalXP: number
@@ -28,7 +29,7 @@ const STORAGE_KEY = 'skill-progress'
 const OLD_TYPING_KEY = 'typing-progress'
 
 const SKILL_AREAS: SkillArea[] = [
-  'organisation', 'effizienz', 'problemloesung', 'tippen', 'shortcuts', 'algorithmen',
+  'organisation', 'effizienz', 'problemloesung', 'tippen', 'shortcuts', 'algorithmen', 'cmd',
 ]
 
 const LEVEL_NAMES: Record<SkillArea, string[]> = {
@@ -38,6 +39,7 @@ const LEVEL_NAMES: Record<SkillArea, string[]> = {
   tippen:         ['', 'Anfänger', 'Lernender', 'Geübter', 'Fortgeschrittener', 'Experte', 'Meister', 'Virtuose', 'Legende', 'Champion', 'Grandmaster'],
   shortcuts:      ['', 'Neuling', 'Lernender', 'Geübter', 'Kenner', 'Virtuose', 'Meister', 'Shortcut-Profi', 'Tastatur-Ninja', 'Shortcut-Meister', 'Keyboard-Legende'],
   algorithmen:    ['', 'Student', 'Assistent', 'Doktorand', 'Forscher', 'Doktor', 'Professor', 'Algorithmus-Experte', 'Informatik-Meister', 'Algorithmus-Legende', 'Turing-Award'],
+  cmd:            ['', 'Anfänger', 'Tipper', 'Befehlskenner', 'CMD-Profi', 'Shell-Experte', 'Terminal-Meister', 'Script-Ninja', 'Konsolen-Virtuose', 'CMD-Champion', 'Shell-Legende'],
 }
 
 export function totalXpForLevel(n: number): number {
@@ -58,6 +60,7 @@ function defaultProgress(): SkillProgress {
       tippen:         defaultEntry(),
       shortcuts:      defaultEntry(),
       algorithmen:    defaultEntry(),
+      cmd:            defaultEntry(),
     },
   }
 }

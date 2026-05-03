@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { FolderOpen, Zap, Wrench, Keyboard, Command, GraduationCap } from 'lucide-react'
+import { FolderOpen, Zap, Wrench, Keyboard, Command, GraduationCap, Terminal } from 'lucide-react'
 import { loadSkillProgress, getLevelInfo, type SkillArea, type LevelInfo } from '@/lib/skill-system'
 
 const SKILL_CONFIG: Record<SkillArea, { label: string; Icon: React.ElementType; color: string; bg: string }> = {
@@ -13,6 +13,7 @@ const SKILL_CONFIG: Record<SkillArea, { label: string; Icon: React.ElementType; 
   tippen:         { label: 'Tippen',          Icon: Keyboard,       color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/40' },
   shortcuts:      { label: 'Shortcuts',       Icon: Command,        color: 'text-blue-600 dark:text-blue-400',     bg: 'bg-blue-100 dark:bg-blue-900/40' },
   algorithmen:    { label: 'Algorithmen',     Icon: GraduationCap,  color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-100 dark:bg-indigo-900/40' },
+  cmd:            { label: 'CMD',             Icon: Terminal,       color: 'text-green-600 dark:text-green-400',   bg: 'bg-green-100 dark:bg-green-900/40' },
 }
 
 interface SkillRow {

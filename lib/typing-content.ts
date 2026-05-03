@@ -73,6 +73,27 @@ export function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+const raceParagraphsDE: string[] = [
+  'Der Computer ist heute aus unserem Alltag nicht mehr wegzudenken. Er hilft uns beim Arbeiten, Lernen und in der Freizeit. Mit Übung und Geduld kann man seine Tippgeschwindigkeit erheblich steigern.',
+  'Gute Tastaturkenntnisse sind im Berufsleben ein großer Vorteil. Wer schnell und fehlerfrei tippt, spart täglich wertvolle Zeit und kann sich besser auf den Inhalt konzentrieren.',
+  'Das Schreiben auf einer Tastatur ist eine Fähigkeit, die man wie Fahrradfahren erlernt. Am Anfang geht es langsam, aber mit regelmäßigem Training wird es zur Routine.',
+  'In der digitalen Welt sind Texte allgegenwärtig. E-Mails, Berichte und Nachrichten — wer effizient tippt, hat einen klaren Vorsprung im Berufsalltag.',
+  'Konzentration und Haltung spielen beim Tippen eine wichtige Rolle. Ein gerader Rücken und entspannte Schultern helfen dabei, schneller und länger ohne Ermüdung zu schreiben.',
+]
+
+const raceParagraphsEN: string[] = [
+  'Typing is one of the most important skills in the modern workplace. The faster and more accurately you type, the more time you save for thinking and creating instead of just transcribing.',
+  'The best typists do not look at the keyboard. They develop muscle memory over time, allowing their fingers to find every key without any conscious effort.',
+  'Speed comes after accuracy. It is far better to type slowly and correctly than to rush and make many mistakes. Build good habits first and speed will follow naturally.',
+  'Regular practice is the key to improving your typing speed. Even fifteen minutes a day will show noticeable progress within just a few weeks of consistent effort.',
+  'Touch typing uses all ten fingers and keeps your eyes on the screen. This technique is the foundation of fast and efficient keyboard use in any professional setting.',
+]
+
+export function generateRaceText(lang: TypingLang = 'de'): string {
+  const pool = lang === 'de' ? raceParagraphsDE : raceParagraphsEN
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
 export function generateTargetText(mode: TypingMode, lang: TypingLang): string {
   if (mode === 'words') {
     const list = lang === 'de' ? wordsDE : wordsEN

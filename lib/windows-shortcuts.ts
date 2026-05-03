@@ -967,6 +967,287 @@ const raw: WindowsShortcut[] = [
     ],
     frequency: 6,
   },
+  // ── Additional shortcuts ───────────────────────────────────────────────────
+  {
+    id: 'win-a',
+    keys: ['Win', 'A'],
+    name: 'Info-Center öffnen',
+    shortDesc: 'Benachrichtigungen und Schnelleinstellungen anzeigen',
+    fullDescription:
+      'Öffnet das Info-Center (Action Center) mit Benachrichtigungen und Schnelleinstellungen wie WLAN, Bluetooth und Helligkeit.',
+    category: 'System',
+    tips: [
+      'Schnell auf WLAN und Bluetooth zugreifen ohne in die Einstellungen zu gehen',
+      'Nicht gelesene Benachrichtigungen werden hier gesammelt',
+    ],
+    frequency: 6,
+  },
+  {
+    id: 'win-n',
+    keys: ['Win', 'N'],
+    name: 'Benachrichtigungszentrale',
+    shortDesc: 'Benachrichtigungspanel öffnen (Windows 11)',
+    fullDescription:
+      'Öffnet in Windows 11 die Benachrichtigungszentrale auf der rechten Seite mit allen Meldungen und Kalenderübersicht.',
+    category: 'System',
+    tips: [
+      'In Windows 10 übernimmt Win+A diese Funktion',
+      'Benachrichtigungen können hier einzeln oder alle auf einmal gelöscht werden',
+    ],
+    frequency: 5,
+  },
+  {
+    id: 'win-pause',
+    keys: ['Win', 'Pause'],
+    name: 'Systemeigenschaften',
+    shortDesc: 'Systeminformationen und Computername anzeigen',
+    fullDescription:
+      'Öffnet die Systemeigenschaften mit Infos zu Prozessor, RAM, Windows-Version und Computernamen. Schnellzugriff ohne Umweg über die Einstellungen.',
+    category: 'System',
+    tips: [
+      'Nützlich um schnell die Windows-Version oder RAM-Menge nachzuschauen',
+      'Über "Erweiterte Systemeinstellungen" gelangt man zu Umgebungsvariablen',
+    ],
+    frequency: 5,
+  },
+  {
+    id: 'win-k',
+    keys: ['Win', 'K'],
+    name: 'Verbindungsleiste',
+    shortDesc: 'Gerät mit Bildschirm oder Lautsprecher verbinden (Cast)',
+    fullDescription:
+      'Öffnet das Cast-Panel zum schnellen Verbinden mit Miracast-Bildschirmen, Bluetooth-Lautsprechern oder anderen Wireless-Displays.',
+    category: 'System',
+    tips: [
+      'Funktioniert für Miracast-fähige Smart-TVs und Projektoren',
+      'Voraussetzung: WLAN und Bluetooth müssen aktiv sein',
+    ],
+    frequency: 4,
+  },
+  {
+    id: 'win-u',
+    keys: ['Win', 'U'],
+    name: 'Bedienungshilfen',
+    shortDesc: 'Center für erleichterte Bedienung öffnen',
+    fullDescription:
+      'Öffnet die Einstellungen für Bedienungshilfen mit Optionen wie Bildschirmlupen, Narrator, Hoher Kontrast und Tastaturhilfen.',
+    category: 'System',
+    tips: [
+      'Bildschirmlupe mit Win++ starten ist noch schneller',
+      'Hier auch Einstellungen für Farbfilter bei Farbenblindheit',
+    ],
+    frequency: 4,
+  },
+  {
+    id: 'win-z',
+    keys: ['Win', 'Z'],
+    name: 'Snap-Layouts',
+    shortDesc: 'Fenster-Anordnungsoptionen anzeigen (Windows 11)',
+    fullDescription:
+      'Zeigt in Windows 11 die Snap-Layout-Optionen an, mit denen man Fenster schnell in verschiedene Bildschirmraster-Anordnungen einrasten kann.',
+    category: 'Fenster',
+    tips: [
+      'Alternativ: Fenster an den oberen Bildschirmrand ziehen für Snap-Optionen',
+      'In Windows 10 nicht verfügbar — dort Win+← / Win+→ verwenden',
+    ],
+    frequency: 5,
+  },
+  {
+    id: 'alt-esc',
+    keys: ['Alt', 'Esc'],
+    name: 'Fenster wechseln (ohne Vorschau)',
+    shortDesc: 'Direkt zum nächsten Fenster wechseln',
+    fullDescription:
+      'Wechselt wie Alt+Tab zum nächsten geöffneten Fenster, aber ohne den Vorschaudialog. Das Fenster wird sofort in den Vordergrund gebracht.',
+    category: 'Fenster',
+    tips: [
+      'Schneller als Alt+Tab wenn man genau weiß was das nächste Fenster ist',
+      'Shift+Alt+Esc wechselt in die entgegengesetzte Richtung',
+    ],
+    frequency: 4,
+  },
+  {
+    id: 'win-shift-left',
+    keys: ['Win', 'Shift', '←'],
+    name: 'Fenster: linker Monitor',
+    shortDesc: 'Aktives Fenster auf linken Monitor verschieben',
+    fullDescription:
+      'Verschiebt das aktuelle Fenster auf den nächsten Monitor links. Sehr praktisch bei Multi-Monitor-Setups.',
+    category: 'Fenster',
+    tips: [
+      'Win+Shift+→ verschiebt das Fenster nach rechts',
+      'Das Fenster behält seine Position und Größe auf dem neuen Monitor',
+    ],
+    frequency: 6,
+  },
+  {
+    id: 'win-shift-right',
+    keys: ['Win', 'Shift', '→'],
+    name: 'Fenster: rechter Monitor',
+    shortDesc: 'Aktives Fenster auf rechten Monitor verschieben',
+    fullDescription:
+      'Verschiebt das aktuelle Fenster auf den nächsten Monitor rechts — ideal bei Dual- oder Triple-Monitor-Setup.',
+    category: 'Fenster',
+    tips: [
+      'Win+Shift+← verschiebt das Fenster nach links',
+      'Funktioniert auch mit mehr als zwei Monitoren',
+    ],
+    frequency: 6,
+  },
+  {
+    id: 'ctrl-shift-j',
+    keys: ['Ctrl', 'Shift', 'J'],
+    name: 'Downloads öffnen',
+    shortDesc: 'Download-Manager im Browser anzeigen',
+    fullDescription:
+      'Öffnet in Chrome und Edge den Download-Bereich, um laufende und abgeschlossene Downloads zu sehen und zu verwalten.',
+    category: 'Browser',
+    tips: [
+      'In Firefox öffnet Ctrl+J die Downloads',
+      'Downloads können direkt im Panel geöffnet, gelöscht oder weitergeführt werden',
+    ],
+    frequency: 6,
+  },
+  {
+    id: 'ctrl-d-browser',
+    keys: ['Ctrl', 'D'],
+    name: 'Lesezeichen setzen',
+    shortDesc: 'Aktuelle Seite als Lesezeichen speichern',
+    fullDescription:
+      'Öffnet den Dialog zum Speichern der aktuellen Seite als Lesezeichen im Browser. Schneller als über das Menü zu gehen.',
+    category: 'Browser',
+    tips: [
+      'Zweites Drücken von Enter bestätigt das Lesezeichen sofort',
+      'Lesezeichen können direkt in einen Ordner sortiert werden',
+    ],
+    frequency: 7,
+  },
+  {
+    id: 'ctrl-r',
+    keys: ['Ctrl', 'R'],
+    name: 'Seite neu laden',
+    shortDesc: 'Aktuelle Webseite neu laden (wie F5)',
+    fullDescription:
+      'Lädt die aktuelle Seite im Browser neu. Identisch mit F5. Ctrl+Shift+R lädt ohne Cache (Hardrefresh).',
+    category: 'Browser',
+    tips: [
+      'Ctrl+Shift+R für Hard-Refresh ohne gecachte Dateien',
+      'F5 funktioniert als Alternative in allen Browsern',
+    ],
+    frequency: 7,
+  },
+  {
+    id: 'f6-browser',
+    keys: ['F6'],
+    name: 'Adressleiste fokussieren',
+    shortDesc: 'Cursor in die Browser-Adressleiste springen',
+    fullDescription:
+      'Setzt den Fokus direkt in die Adressleiste des Browsers, um eine URL einzugeben oder zu suchen — schnelle Alternative zu Ctrl+L.',
+    category: 'Browser',
+    tips: [
+      'Ctrl+L macht dasselbe in den meisten Browsern',
+      'Die aktuell angezeigte URL wird automatisch markiert',
+    ],
+    frequency: 6,
+  },
+  {
+    id: 'alt-enter-explorer',
+    keys: ['Alt', 'Enter'],
+    name: 'Eigenschaften anzeigen',
+    shortDesc: 'Eigenschaften der markierten Datei öffnen',
+    fullDescription:
+      'Öffnet das Eigenschaften-Fenster der ausgewählten Datei oder des Ordners im Windows Explorer — zeigt Dateigröße, Erstelldatum, Berechtigungen und mehr.',
+    category: 'Datei',
+    tips: [
+      'Alternativ: Rechtsklick → Eigenschaften',
+      'Über Eigenschaften lassen sich auch Dateiattribute und Sicherheitseinstellungen ändern',
+    ],
+    frequency: 6,
+  },
+  {
+    id: 'ctrl-shift-s',
+    keys: ['Ctrl', 'Shift', 'S'],
+    name: 'Speichern unter',
+    shortDesc: 'Datei unter einem neuen Namen oder Pfad speichern',
+    fullDescription:
+      'Öffnet den "Speichern unter"-Dialog, mit dem eine Datei unter einem neuen Namen, Dateityp oder an einem anderen Speicherort gespeichert werden kann.',
+    category: 'Datei',
+    tips: [
+      'Ideal für Kopien mit neuen Namen (z. B. bericht_v2.docx)',
+      'Funktioniert in fast allen Office- und Designprogrammen',
+    ],
+    frequency: 7,
+  },
+  {
+    id: 'alt-left',
+    keys: ['Alt', '←'],
+    name: 'Zurück navigieren',
+    shortDesc: 'Im Explorer oder Browser eine Seite/Ordner zurück',
+    fullDescription:
+      'Navigiert im Windows Explorer oder im Browser eine Ebene zurück — entspricht dem Klick auf den Zurück-Pfeil.',
+    category: 'Navigation',
+    tips: [
+      'Alt+→ geht entsprechend vorwärts',
+      'Funktioniert in Explorer, Chrome, Edge, Firefox und vielen anderen Apps',
+    ],
+    frequency: 7,
+  },
+  {
+    id: 'alt-right',
+    keys: ['Alt', '→'],
+    name: 'Vorwärts navigieren',
+    shortDesc: 'Im Explorer oder Browser eine Seite/Ordner vorwärts',
+    fullDescription:
+      'Navigiert im Windows Explorer oder im Browser eine Ebene vorwärts — nur möglich nach einem vorherigen Zurück-Schritt.',
+    category: 'Navigation',
+    tips: [
+      'Alt+← geht entsprechend zurück',
+      'Gleichwertig mit dem Klick auf den Vorwärts-Pfeil',
+    ],
+    frequency: 6,
+  },
+  {
+    id: 'win-print-screen',
+    keys: ['Win', 'Druck'],
+    name: 'Screenshot automatisch speichern',
+    shortDesc: 'Screenshot erstellen und direkt als Datei speichern',
+    fullDescription:
+      'Erstellt einen Screenshot des gesamten Bildschirms und speichert ihn automatisch im Ordner "Bilder/Screenshots" als PNG-Datei.',
+    category: 'Screenshot',
+    tips: [
+      'Im Gegensatz zu Druck allein wird hier direkt gespeichert ohne Zwischenablage',
+      'Datei erhält automatisch einen Zeitstempel als Namen',
+    ],
+    frequency: 7,
+  },
+  {
+    id: 'ctrl-g',
+    keys: ['Ctrl', 'G'],
+    name: 'Gehe zu Zeile',
+    shortDesc: 'Zu einer bestimmten Zeile oder Position springen',
+    fullDescription:
+      'Öffnet in Code-Editoren und Notizprogrammen einen Dialog zum Springen an eine bestimmte Zeilennummer. Sehr nützlich bei langen Dokumenten.',
+    category: 'Navigation',
+    tips: [
+      'In VS Code, Notepad++ und Word verfügbar',
+      'In VS Code mit Ctrl+G oder Ctrl+P und dann ":" für Zeile',
+    ],
+    frequency: 5,
+  },
+  {
+    id: 'ctrl-k',
+    keys: ['Ctrl', 'K'],
+    name: 'Hyperlink einfügen',
+    shortDesc: 'Link in Dokument oder E-Mail einfügen',
+    fullDescription:
+      'Öffnet in Word, Outlook, OneNote und anderen Office-Programmen den Dialog zum Einfügen oder Bearbeiten eines Hyperlinks.',
+    category: 'Bearbeiten',
+    tips: [
+      'Markierten Text vor dem Drücken als Linktext verwenden',
+      'In VS Code öffnet Ctrl+K eine zweite Shortcut-Ebene',
+    ],
+    frequency: 6,
+  },
 ]
 
 export const shortcuts: WindowsShortcut[] = raw.sort((a, b) => b.frequency - a.frequency)
