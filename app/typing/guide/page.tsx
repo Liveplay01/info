@@ -1,4 +1,3 @@
-import { Header } from '@/components/header'
 import { KeyboardVisual } from '@/components/typing/keyboard-visual'
 import { TypingStatsEmbed } from '@/components/typing/typing-stats-embed'
 import Link from 'next/link'
@@ -54,9 +53,7 @@ function Step({
 
 export default function TypingGuidePage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-10">
+    <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-10">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
@@ -257,7 +254,6 @@ export default function TypingGuidePage() {
           <TypingStatsEmbed />
         </section>
 
-      </main>
     </div>
   )
 }

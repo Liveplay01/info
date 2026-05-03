@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Header } from '@/components/header'
 import { RotateCcw, Timer, ChevronLeft, Lightbulb } from 'lucide-react'
 import { addXP } from '@/lib/skill-system'
 import { playCorrect, playWrong, playGameOver, playClick } from '@/lib/sounds'
@@ -126,9 +125,7 @@ export default function BugFixerPage() {
 
   if (phase === 'idle') {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -161,7 +158,6 @@ export default function BugFixerPage() {
               Wähle ein Szenario oder starte mit dem ersten Bug.
             </p>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -170,9 +166,7 @@ export default function BugFixerPage() {
 
   if (phase === 'result') {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]">
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -233,7 +227,6 @@ export default function BugFixerPage() {
               </button>
             </div>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -241,9 +234,7 @@ export default function BugFixerPage() {
   // ── Game screen ────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 flex flex-col items-center px-4 py-6 max-w-xl mx-auto w-full">
+    <div className="flex flex-col items-center px-4 py-6 max-w-xl mx-auto w-full min-h-[calc(100vh-3.5rem)]">
 
         {/* HUD */}
         <div className="w-full mb-4">
@@ -377,7 +368,6 @@ export default function BugFixerPage() {
           </span>
         </div>
 
-      </main>
     </div>
   )
 }

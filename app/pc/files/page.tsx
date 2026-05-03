@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { Header } from '@/components/header'
 import {
   Folder, FolderOpen, File, Search, ArrowRight,
   ChevronRight, Check, X, AlertTriangle, RefreshCw,
@@ -386,9 +385,7 @@ export default function FilesPage() {
   const s5 = useSection()
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-10">
+    <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-10">
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
@@ -528,7 +525,6 @@ export default function FilesPage() {
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>
-      </main>
     </div>
   )
 }

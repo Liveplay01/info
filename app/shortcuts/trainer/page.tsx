@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Flame, Trophy, RotateCcw, Zap } from 'lucide-react'
-import { Header } from '@/components/header'
 import { shortcuts, categoryConfig, type WindowsShortcut, type ShortcutCategory } from '@/lib/windows-shortcuts'
 import { playCorrect, playWrong, playTick, playGameOver, playClick } from '@/lib/sounds'
 import { cn } from '@/lib/utils'
@@ -201,9 +200,7 @@ export default function TrainerPage() {
 
   if (phase === 'idle') {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -249,7 +246,6 @@ export default function TrainerPage() {
               </Link>
             </div>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -258,9 +254,7 @@ export default function TrainerPage() {
 
   if (phase === 'result') {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]">
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -316,7 +310,6 @@ export default function TrainerPage() {
               </Link>
             </div>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -327,9 +320,7 @@ export default function TrainerPage() {
   const timerColor = timeLeft > 10 ? 'bg-violet-500' : timeLeft > 5 ? 'bg-amber-500' : 'bg-rose-500'
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 flex flex-col items-center px-4 py-6 sm:py-10 max-w-2xl mx-auto w-full">
+    <div className="flex flex-col items-center px-4 py-6 sm:py-10 max-w-2xl mx-auto w-full min-h-[calc(100vh-3.5rem)]">
 
         {/* HUD */}
         <div className="w-full mb-6">
@@ -467,7 +458,6 @@ export default function TrainerPage() {
             </div>
           </motion.div>
         </AnimatePresence>
-      </main>
     </div>
   )
 }

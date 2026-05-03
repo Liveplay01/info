@@ -4,7 +4,6 @@ import React, { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Search, X, Lightbulb, Gamepad2 } from 'lucide-react'
-import { Header } from '@/components/header'
 import { cn } from '@/lib/utils'
 import {
   shortcuts,
@@ -241,10 +240,7 @@ export function ShortcutsClient() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-10">
+    <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-10">
         {/* Hero */}
         <div className="mb-8">
           <div className="font-mono text-sm font-semibold text-violet-600 dark:text-violet-400 mb-2">
@@ -350,7 +346,6 @@ export function ShortcutsClient() {
             </p>
           </div>
         )}
-      </main>
 
       <ShortcutDrawer
         shortcut={selected}

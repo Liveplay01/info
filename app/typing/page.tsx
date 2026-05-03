@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Header } from '@/components/header'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -38,9 +37,7 @@ const cards = [
 
 export default function TypingHubPage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-10">
+    <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-10">
         <div className="mb-10">
           <div className="font-mono text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
             ⟨type/⟩
@@ -94,7 +91,6 @@ export default function TypingHubPage() {
             </Link>
           ))}
         </div>
-      </main>
     </div>
   )
 }

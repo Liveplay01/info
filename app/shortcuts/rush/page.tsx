@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, RotateCcw, Zap, Keyboard } from 'lucide-react'
-import { Header } from '@/components/header'
 import { shortcuts, type WindowsShortcut } from '@/lib/windows-shortcuts'
 import { WORKFLOWS, type Workflow } from '@/lib/shortcut-rush-workflows'
 import { playCorrect, playWrong, playTick, playGameOver, playClick } from '@/lib/sounds'
@@ -161,6 +160,14 @@ export default function ShortcutRushPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
+  // Cleanup all timers on unmount (prevents leaked sounds when navigating away mid-game)
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      if (stepTimerRef.current) clearInterval(stepTimerRef.current)
+    }
+  }, [])
+
   // Global timer
   useEffect(() => {
     if (phase !== 'playing') return
@@ -171,7 +178,10 @@ export default function ShortcutRushPage() {
         return t - 1
       })
     }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      if (stepTimerRef.current) clearInterval(stepTimerRef.current)
+    }
   }, [phase, endGame])
 
   function startStepTimer() {
@@ -352,9 +362,7 @@ export default function ShortcutRushPage() {
 
   if (phase === 'idle') {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -414,7 +422,6 @@ export default function ShortcutRushPage() {
               </Link>
             </div>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -423,9 +430,7 @@ export default function ShortcutRushPage() {
 
   if (phase === 'result') {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]">
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -480,7 +485,6 @@ export default function ShortcutRushPage() {
               </Link>
             </div>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -493,9 +497,7 @@ export default function ShortcutRushPage() {
 
   if (isTouchOnly) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]">
           <div className="max-w-sm">
             <div className="text-5xl mb-6">⌨️</div>
             <h2 className="text-2xl font-bold mb-3">Physische Tastatur benötigt</h2>
@@ -509,15 +511,12 @@ export default function ShortcutRushPage() {
               Zurück
             </button>
           </div>
-        </main>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 flex flex-col items-center px-4 py-6 sm:py-10 max-w-2xl mx-auto w-full">
+    <div className="flex flex-col items-center px-4 py-6 sm:py-10 max-w-2xl mx-auto w-full min-h-[calc(100vh-3.5rem)]">
 
         {/* HUD */}
         <div className="w-full mb-4">
@@ -650,7 +649,6 @@ export default function ShortcutRushPage() {
             )}
           </motion.div>
         </AnimatePresence>
-      </main>
     </div>
   )
 }

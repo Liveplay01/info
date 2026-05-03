@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
-import { Header } from '@/components/header'
 import { wordsDE, wordsEN, type TypingLang } from '@/lib/typing-content'
 import { addXP } from '@/lib/skill-system'
 import { playCorrect, playWrong, playGameOver, playClick } from '@/lib/sounds'
@@ -51,7 +50,7 @@ const STARS = Array.from({ length: 80 }, (_, i) => ({
 
 function LaserBeam({ fromX, toX, toY }: { fromX: number; toX: number; toY: number }) {
   const dx = toX - fromX
-  const dy = toY - 88 // ship is at ~88% height
+  const dy = toY - 76 // ship is at ~76% height
   const len = Math.sqrt(dx * dx + dy * dy)
   const angle = Math.atan2(dy, dx) * (180 / Math.PI)
 
@@ -63,7 +62,7 @@ function LaserBeam({ fromX, toX, toY }: { fromX: number; toX: number; toY: numbe
       style={{
         position: 'absolute',
         left: `${fromX}%`,
-        top: '88%',
+        top: '76%',
         width: `${len}%`,
         height: '2px',
         background: 'linear-gradient(90deg, #f97316, #fbbf24, #fff)',
@@ -97,11 +96,14 @@ function Explosion({ x, y }: { x: number; y: number }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const TICK_MS = 100
-const SPAWN_INTERVAL = 2800
-const MAX_ASTEROIDS = 4
-const BASE_SPEED = 0.28
-const SPEED_INCREASE_PER_KILL = 0.012
+const SPAWN_INTERVAL = 1500
+const BASE_SPEED = 0.45
+const SPEED_INCREASE_PER_KILL = 0.008
 const MAX_LIVES = 3
+
+function maxAsteroids(kills: number) {
+  return Math.min(8, 3 + Math.floor(kills / 4))
+}
 
 let asteroidIdCounter = 0
 
@@ -147,7 +149,7 @@ export default function TypingRacePage() {
   const spawnAsteroid = useCallback(() => {
     if (phaseRef.current !== 'playing') return
     const current = asteroidsRef.current
-    if (current.length >= MAX_ASTEROIDS) return
+    if (current.length >= maxAsteroids(killRef.current)) return
 
     const existingTexts = current.map(a => a.text)
     const text = randomWord(langRef.current, existingTexts)
@@ -196,7 +198,7 @@ export default function TypingRacePage() {
       for (const a of prev) {
         if (a.exploding) continue
         const newY = a.y + a.speed
-        if (newY >= 92) {
+        if (newY >= 80) {
           livesLost++
           playWrong()
           // Clear target if this asteroid was targeted
@@ -236,6 +238,14 @@ export default function TypingRacePage() {
     }
   }, [phase, tick, spawnAsteroid])
 
+  // Cleanup on unmount — prevents leaked tick/spawn timers when navigating away
+  useEffect(() => {
+    return () => {
+      if (tickRef.current) clearInterval(tickRef.current)
+      if (spawnRef.current) clearInterval(spawnRef.current)
+    }
+  }, [])
+
   function startGame() {
     playClick()
     asteroidIdCounter = 0
@@ -257,7 +267,10 @@ export default function TypingRacePage() {
     setPhase('playing')
     setTimeout(() => {
       inputRef.current?.focus()
+      // Spawn 3 asteroids immediately for a lively start
       spawnAsteroid()
+      setTimeout(spawnAsteroid, 300)
+      setTimeout(spawnAsteroid, 600)
     }, 100)
   }
 
@@ -369,9 +382,7 @@ export default function TypingRacePage() {
 
   if (phase === 'idle') {
     return (
-      <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #020817 0%, #0a0f1e 100%)' }}>
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]" style={{ background: 'linear-gradient(180deg, #020817 0%, #0a0f1e 100%)' }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -435,7 +446,6 @@ export default function TypingRacePage() {
               </motion.button>
             </div>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -444,9 +454,7 @@ export default function TypingRacePage() {
 
   if (phase === 'result') {
     return (
-      <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #020817 0%, #0a0f1e 100%)' }}>
-        <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center min-h-[calc(100vh-3.5rem)]" style={{ background: 'linear-gradient(180deg, #020817 0%, #0a0f1e 100%)' }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -503,7 +511,6 @@ export default function TypingRacePage() {
               </Link>
             </div>
           </motion.div>
-        </main>
       </div>
     )
   }
@@ -542,8 +549,14 @@ export default function TypingRacePage() {
         <div className="text-white font-bold tabular-nums text-lg">
           ⭐ {score}
         </div>
-        <div className="text-slate-400 text-sm">
-          💥 {killCount} Treffer
+        <div className="flex items-center gap-3">
+          <span className="text-slate-400 text-sm">💥 {killCount}</span>
+          <button
+            onClick={endGame}
+            className="text-xs text-slate-500 hover:text-rose-400 border border-white/10 hover:border-rose-400/40 rounded px-2 py-0.5 transition-colors"
+          >
+            Abbrechen
+          </button>
         </div>
       </div>
 
@@ -625,7 +638,7 @@ export default function TypingRacePage() {
       <motion.div
         animate={{ y: [-2, 2, -2] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ position: 'absolute', left: `${shipX}%`, top: '88%', transform: 'translate(-50%, -50%)', zIndex: 15 }}
+        style={{ position: 'absolute', left: `${shipX}%`, top: '76%', transform: 'translate(-50%, -50%)', zIndex: 15 }}
       >
         <div className="text-4xl drop-shadow-[0_0_16px_rgba(249,115,22,0.6)]">🚀</div>
       </motion.div>
@@ -633,7 +646,7 @@ export default function TypingRacePage() {
       {/* Danger zone indicator */}
       <div
         className="absolute left-0 right-0 border-t border-dashed border-rose-500/30 pointer-events-none"
-        style={{ top: '85%', zIndex: 5 }}
+        style={{ top: '73%', zIndex: 5 }}
       />
 
       {/* Input area */}

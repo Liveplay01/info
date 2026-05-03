@@ -18,10 +18,9 @@ const NAV_GROUPS = [
     label: '⟨java/⟩',
     color: 'text-blue-600 dark:text-blue-400',
     items: [
-      { href: '/sort',                   label: 'Sortieralgorithmen',  tag: '⟨sort/⟩',   tagColor: 'text-blue-500 dark:text-blue-400',     desc: '10 Algorithmen interaktiv' },
-      { href: '/sort/playground',        label: 'Playground',          tag: '⟨sort/⟩',   tagColor: 'text-blue-500 dark:text-blue-400',     desc: 'Algorithmen vergleichen' },
-      { href: '/sort/interview-trainer', label: 'Interview-Trainer',   tag: '⟨sort/⟩',   tagColor: 'text-blue-500 dark:text-blue-400',     desc: 'Quiz-Spiel', isGame: true },
-      { href: '/array',                  label: 'Java Arrays',          tag: '⟨array/⟩',  tagColor: 'text-orange-500 dark:text-orange-400', desc: '11 Array-Typen erklärt' },
+      { href: '/sort',            label: 'Sortieralgorithmen', tag: '⟨sort/⟩',  tagColor: 'text-blue-500 dark:text-blue-400',     desc: '10 Algorithmen interaktiv' },
+      { href: '/sort/playground', label: 'Playground',         tag: '⟨sort/⟩',  tagColor: 'text-blue-500 dark:text-blue-400',     desc: 'Algorithmen vergleichen' },
+      { href: '/array',           label: 'Java Arrays',         tag: '⟨array/⟩', tagColor: 'text-orange-500 dark:text-orange-400', desc: '11 Array-Typen erklärt' },
     ],
   },
   {

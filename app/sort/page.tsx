@@ -41,7 +41,7 @@ export default function DocsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {algorithms.map((algo) => (
-          <Link key={algo.slug} href={`/docs/${algo.slug}`} className="group block">
+          <Link key={algo.slug} href={`/sort/${algo.slug}`} className="group block">
             <Card className="h-full hover:border-primary/40 transition-colors">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
