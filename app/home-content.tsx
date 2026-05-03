@@ -138,13 +138,27 @@ const GAMES = [
     flavor: 'PC · Problemlösung',
     desc: 'PC-Probleme durch Windows-Navigation lösen — mehrere Wege.',
   },
+  {
+    href: '/typing/race',
+    tag: '⟨type/⟩', tagColor: 'text-emerald-400',
+    label: 'Typing Race',
+    flavor: 'PC · Tippen',
+    desc: 'Schieß Asteroiden ab, indem du ihre Wörter schnell genug eintippst.',
+  },
+  {
+    href: '/cmd/trainer',
+    tag: '⟨cmd/⟩', tagColor: 'text-green-400',
+    label: 'CMD Trainer',
+    flavor: 'PC · Konsole',
+    desc: '60s CMD-Quiz: Erkenne Windows-Befehle und ihre Syntax.',
+  },
 ]
 
 const STATS = [
   { value: '10', label: 'Algorithmen' },
   { value: '11', label: 'Array-Typen' },
   { value: '56', label: 'Shortcuts' },
-  { value: '6', label: 'Minigames' },
+  { value: '8', label: 'Minigames' },
 ]
 
 const HERO_CHARS = ['⟨', 'i', 'n', 'f', 'o', '/', '⟩']
@@ -367,7 +381,7 @@ export function HomeContent() {
                 tag="⟨games/⟩"
                 tagColor="text-violet-600 dark:text-violet-400"
                 title="Minigames"
-                subtitle="Lernstoff spielerisch festigen — 6 Minigames, Skill-Levels, tägliche Challenges."
+                subtitle="Lernstoff spielerisch festigen — 8 Minigames, Skill-Levels, tägliche Challenges."
               />
               <a
                 href="/games"

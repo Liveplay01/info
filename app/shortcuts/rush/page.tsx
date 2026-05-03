@@ -247,18 +247,31 @@ export default function ShortcutRushPage() {
     }, FEEDBACK_DELAY)
   }
 
-  // Keyboard detection
+  // Keyboard detection — derive modifiers from event properties (avoids stuck-key bugs)
   useEffect(() => {
     if (phase !== 'playing') return
 
+    const MODIFIER_KEYS = new Set(['Control', 'Shift', 'Alt', 'Meta', 'OS'])
+
+    function modifiersFromEvent(e: KeyboardEvent): string[] {
+      const mods: string[] = []
+      if (e.ctrlKey)  mods.push('Ctrl')
+      if (e.shiftKey) mods.push('Shift')
+      if (e.altKey)   mods.push('Alt')
+      if (e.metaKey)  mods.push('Win')
+      return mods
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      const MODIFIERS = new Set(['Control', 'Shift', 'Alt', 'Meta'])
-      if (MODIFIERS.has(e.key)) {
-        const normalized = normalizeKey(e.key)
-        modifiersRef.current.add(normalized)
-        setPressedKeys(new Set(Array.from(modifiersRef.current)))
-        return
-      }
+      // Update visual pressed-keys display
+      const visualMods = modifiersFromEvent(e)
+      const isModifierPress = MODIFIER_KEYS.has(e.key)
+      const displayKeys = isModifierPress
+        ? visualMods
+        : [...visualMods, normalizeKey(e.key)]
+      setPressedKeys(new Set(displayKeys))
+
+      if (isModifierPress) return
 
       e.preventDefault()
 
@@ -267,8 +280,7 @@ export default function ShortcutRushPage() {
       if (!wf || isAnsweredRef.current) return
 
       const normalizedKey = normalizeKey(e.key)
-      const pressed = Array.from(modifiersRef.current).concat(normalizedKey)
-      setPressedKeys(new Set(Array.from(modifiersRef.current).concat(normalizedKey)))
+      const pressed = [...modifiersFromEvent(e), normalizedKey]
 
       const step = wf.steps[stepIdx]
       const correct = getShortcutById(step.shortcutId)
@@ -281,17 +293,25 @@ export default function ShortcutRushPage() {
       }
     }
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-      const normalized = normalizeKey(e.key)
-      modifiersRef.current.delete(normalized)
-      setPressedKeys(new Set(Array.from(modifiersRef.current)))
+    const handleKeyUp = () => {
+      // Clear pressed display when all keys released
+      // Can't reliably track individual keys — just clear on any keyup
+      setPressedKeys(new Set())
+    }
+
+    // Clear modifiers when window loses focus (e.g. Win key captured by OS)
+    const handleBlur = () => {
+      setPressedKeys(new Set())
+      modifiersRef.current.clear()
     }
 
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
+    window.addEventListener('blur', handleBlur)
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
+      window.removeEventListener('blur', handleBlur)
       modifiersRef.current.clear()
       setPressedKeys(new Set())
     }
