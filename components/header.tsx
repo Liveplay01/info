@@ -36,6 +36,20 @@ const NAV_GROUPS = [
     ],
   },
   {
+    id: 'tools',
+    label: '⟨tools/⟩',
+    color: 'text-sky-600 dark:text-sky-400',
+    items: [
+      { href: '/tools',                 label: 'Alle Tools',             tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400', desc: '6 Browser-Tools' },
+      { href: '/tools/qr-code',         label: 'QR-Code Generator',      tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400', desc: 'Text oder URL als QR' },
+      { href: '/tools/color-converter', label: 'Color Converter',        tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400', desc: 'HEX ↔ RGB ↔ HSL' },
+      { href: '/tools/palette',         label: 'Farbpaletten-Generator', tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400', desc: '5 harmonische Farben' },
+      { href: '/tools/password',        label: 'Passwort-Generator',     tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400', desc: 'Kryptografisch sicher' },
+      { href: '/tools/json-formatter',  label: 'JSON Formatter',         tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400', desc: 'Formatieren & validieren' },
+      { href: '/tools/base64',          label: 'Base64 Coder',           tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400', desc: 'Encode & Decode' },
+    ],
+  },
+  {
     id: 'games',
     label: '⟨games/⟩',
     color: 'text-violet-600 dark:text-violet-400',

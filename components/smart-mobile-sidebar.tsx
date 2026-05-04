@@ -7,15 +7,23 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { SidebarNav } from '@/components/sidebar-nav'
 import { ArraySidebarNav } from '@/components/array-sidebar-nav'
+import { ToolsSidebarNav } from '@/components/tools-sidebar-nav'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 export function SmartMobileSidebar() {
   const [open, setOpen] = React.useState(false)
   const pathname = usePathname()
   const isArraySection = pathname.startsWith('/array')
-  const inSection = pathname.startsWith('/array') || pathname.startsWith('/sort')
+  const isToolsSection = pathname.startsWith('/tools')
+  const inSection = pathname.startsWith('/array') || pathname.startsWith('/sort') || isToolsSection
 
   if (!inSection) return null
+
+  function getTitle() {
+    if (isArraySection) return '⟨sort/⟩ Arrays'
+    if (isToolsSection) return '⟨tools/⟩ Tools'
+    return '⟨sort/⟩ SortDocs'
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -24,16 +32,13 @@ export function SmartMobileSidebar() {
       </Button>
       <SheetContent side="left" className="w-72 p-0">
         <SheetHeader className="px-6 py-4 border-b">
-          <SheetTitle className="text-left">
-            {isArraySection ? '⟨sort/⟩ Arrays' : '⟨sort/⟩ SortDocs'}
-          </SheetTitle>
+          <SheetTitle className="text-left">{getTitle()}</SheetTitle>
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-5rem)]">
           <div className="px-4 py-4">
-            {isArraySection
-              ? <ArraySidebarNav onNavigate={() => setOpen(false)} />
-              : <SidebarNav onNavigate={() => setOpen(false)} />
-            }
+            {isArraySection && <ArraySidebarNav onNavigate={() => setOpen(false)} />}
+            {isToolsSection && <ToolsSidebarNav onNavigate={() => setOpen(false)} />}
+            {!isArraySection && !isToolsSection && <SidebarNav onNavigate={() => setOpen(false)} />}
           </div>
         </ScrollArea>
       </SheetContent>

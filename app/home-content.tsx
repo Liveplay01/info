@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
 import { Header } from '@/components/header'
 import { SkillBadge } from '@/components/skills/skill-badge'
-import { Gamepad2 } from 'lucide-react'
+import { Gamepad2, Wrench } from 'lucide-react'
 
 // ── Site data ────────────────────────────────────────────────────────────────
 
@@ -154,11 +154,45 @@ const GAMES = [
   },
 ]
 
+const TOOLS_CARDS = [
+  {
+    href: '/tools/qr-code',
+    tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400',
+    label: 'QR-Code Generator',
+    desc: 'Text oder URL in Sekunden in einen QR-Code umwandeln — mit Download als PNG.',
+    chips: ['Text', 'URL', 'Download'],
+    badge: 'Generator',
+    badgeCls: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+    hoverCls: 'hover:border-sky-400/60 dark:hover:border-sky-500/60',
+  },
+  {
+    href: '/tools/color-converter',
+    tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400',
+    label: 'Color Converter',
+    desc: 'Farben zwischen HEX, RGB und HSL umrechnen — mit Live-Vorschau und One-Click-Copy.',
+    chips: ['HEX', 'RGB', 'HSL'],
+    badge: 'Konverter',
+    badgeCls: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+    hoverCls: 'hover:border-sky-400/60 dark:hover:border-sky-500/60',
+  },
+  {
+    href: '/tools/palette',
+    tag: '⟨tools/⟩', tagColor: 'text-sky-500 dark:text-sky-400',
+    label: 'Farbpaletten-Generator',
+    desc: 'Harmonische 5-Farb-Paletten aus einer Basisfarbe — Analogous, Komplementär und mehr.',
+    chips: ['Analogous', 'Komplementär', 'Triadisch'],
+    badge: 'Generator',
+    badgeCls: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+    hoverCls: 'hover:border-sky-400/60 dark:hover:border-sky-500/60',
+  },
+]
+
 const STATS = [
   { value: '10', label: 'Algorithmen' },
   { value: '11', label: 'Array-Typen' },
   { value: '56', label: 'Shortcuts' },
   { value: '8', label: 'Minigames' },
+  { value: '6', label: 'Tools' },
 ]
 
 const HERO_CHARS = ['⟨', 'i', 'n', 'f', 'o', '/', '⟩']
@@ -368,6 +402,36 @@ export function HomeContent() {
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {PC_CARDS.map((card, i) => (
+              <ContentCard key={card.href} card={card} index={i} />
+            ))}
+          </div>
+        </section>
+
+        {/* Tools section */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="border-t border-border" />
+        </div>
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-16">
+          <div className="flex items-start justify-between mb-8">
+            <SectionHeading
+              tag="⟨tools/⟩"
+              tagColor="text-sky-600 dark:text-sky-400"
+              title="Browser-Tools"
+              subtitle="Praktische Alltagswerkzeuge — direkt im Browser, kein Download nötig."
+            />
+            <a
+              href="/tools"
+              className="shrink-0 mt-1 text-sm font-semibold text-sky-600 dark:text-sky-400 hover:underline hidden sm:block"
+            >
+              Alle 6 Tools →
+            </a>
+          </div>
+          <div className="flex items-center gap-2 mb-6 -mt-4">
+            <Wrench className="h-4 w-4 text-sky-500" />
+            <span className="text-sm text-muted-foreground">Kein Login · Keine Registrierung · Direkt loslegen</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {TOOLS_CARDS.map((card, i) => (
               <ContentCard key={card.href} card={card} index={i} />
             ))}
           </div>
